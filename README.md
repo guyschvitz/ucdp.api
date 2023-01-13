@@ -34,13 +34,13 @@ The function takes the following 3 arguments:
 
 #### Examples
 ```r
-## Load one-sided violence dataset
+## Load one-sided violence dataset (version 22.1, released Jul 2022)
 osv.df <- getUcdpData(dataset = "onesided", version = "22.1", pagesize = 1000)
 
-## Load GED data
+## Load GED data (version 22.1, released Jul 2022)
 dyd.df <- getUcdpData(dataset = "gedevents", version = "22.1", pagesize = 1000)
 
-## Load GED candidate event data for November 2022
+## Load GED candidate event data for Nov 2022 (version 22.0.11, released Dec 2022)
 dyd.df <- getUcdpData(dataset = "gedevents", version = "22.0.11", pagesize = 1000)
 ```
 
