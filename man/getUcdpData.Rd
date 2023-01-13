@@ -29,6 +29,6 @@ data.frame with requested UCDP dataset
 getUcdpData: Download data from the Uppsala Conflict Database Program API.
 }
 \examples{
-getUCDPData(dataset = ucdpprioconflict, version = "22.1", pagesize = 100)
-getUCDPData(dataset = gedevents, version = "22.1", pagesize = 100)
+getUcdpData(dataset = ucdpprioconflict, version = "22.1", pagesize = 100)
+getUcdpData(dataset = gedevents, version = "22.1", pagesize = 100)
 }

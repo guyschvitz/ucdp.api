@@ -23,7 +23,7 @@
 #' getUcdpData(dataset = gedevents, version = "22.1", pagesize = 100)
 getUcdpData <- function(dataset, version, pagesize = 100){
 
-  ## Stop if requested pagesize greater than 1000
+  ## Stop if requested pagesize greßater than 1000
   if(pagesize > 1000){
     stop("Page size cannot exceed 1000")
   }
