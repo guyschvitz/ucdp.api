@@ -32,6 +32,13 @@ getUcdpData <- function(dataset, version, pagesize = 100){
   dataset.names <- c("ucdpprioconflict", "battledeaths", "dyadic", "nonstate",
                      "onesided", "gedevents")
 
+  dataset.labels <- c("UCDP armed conflict dataset",
+                                      "UCDP battle-related deaths dataset",
+                                      "UCDP dyadic dataset",
+                                      "UCDP non-state conflict dataset",
+                                      "UCDP one-sided violence dataset",
+                                      "UCDP georeferenced event dataset")
+
   dataset.string <- paste(paste0("'", dataset.names, "'"), collapse = ", ")
 
   if(!dataset %in% dataset.names){
@@ -78,6 +85,17 @@ getUcdpData <- function(dataset, version, pagesize = 100){
 
   ## ... Apply function to all columns (only converts true numeric columns)
   outdata.df <- dplyr::mutate_if(outdata.df, isNumeric, as.numeric)
+
+  # Generate output message
+  data.lbl <- dataset.labels[dataset.names == dataset]
+  candidate.data <- !grepl("^[0-9]{2}\\.[0-9]{1}$", version) & dataset == "gedevents"
+
+  if(candidate.data){
+    data.lbl <- sprintf("%s (%s)", data.lbl, "Candidate events")
+  }
+
+  # Print output message
+  message(sprintf("Retrieved %s, Version %s.", data.lbl, version))
 
   ## Return output dataframe
   return(outdata.df)
