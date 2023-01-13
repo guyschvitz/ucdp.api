@@ -2,8 +2,8 @@
 #'
 #' @param dataset character. Name of UCDP dataset. Needs to be one of the following:
 #' "ucdpprioconflict", "battledeaths", "dyadic", "nonstate", "onesided" (yearly data),
-#' or "gedevents (daily data, released in monthly batches)
-#' The API does not require an account/key but there are use limitations
+#' or "gedevents" (daily data, released in monthly batches)
+#' The API does not require an account/key but there are some usage limitations
 #' For more information, see: https://ucdp.uu.se/apidocs/
 #'
 #' @param version character. Dataset version number.
