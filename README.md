@@ -1,36 +1,43 @@
 # ucdp.api
 Guy Schvitz, 13. Jan 2023
 
-This package allows users to load data from the Uppsala Conflict Database Program (UCDP) API directly into R. Available datasets include: UCDP/PRIO armed conflict, Battle-related deaths, Dyadic conflict, Non-state conflict, One-sided violence, Georeferenced Events Data (GED) and the GED candidate events datasets. For more information on these datasets, see: https://ucdp.uu.se/apidocs/
+This package allows users to load data from the Uppsala Conflict Database Program (UCDP) API directly into R. 
+
+Available datasets include: UCDP/PRIO armed conflict, Battle-related deaths, Dyadic conflict, Non-state conflict, One-sided violence, Georeferenced Events Data (GED) and the GED candidate events datasets. 
 
 ## Installation
 You can install the package as follows:
 
 ```r
 library(devtools)
-install_github("guyschvitz/ucdp.api")
+devtools::install_github("guyschvitz/ucdp.api")
 ```
-You also need the `dplyr` and `httr` packages in R. R will try to install them if not already installed.
+You also need the `dplyr` and `httr` packages. R will try to install these dependencies if not already installed.
 
 ## `getUcdpData`: Load UCDP data from the API
 This function allows users to download one of the following datasets:
 
 #### Yearly data
-- Armed conflict dataset
-- Battle-related deaths dataset
-- Dyadic conflict dataset
+- Armed conflict dataset (State-based conflict)
+- Battle-related deaths dataset (State-based conflict)
+- Dyadic conflict dataset (State-based conflict) 
 - Non-state conflict dataset
 - One-sided violence dataset
 
 #### Daily data (Conflict event data)
-- Georeferenced Event Dataset (GED)
-- Georeferenced Event Dataset (GED), Candidate eent data
+- Georeferenced Event Dataset (GED), Stable releases (Updated yearly)
+- Georeferenced Event Dataset (GED), Candidate event data (Updated monthly)
 
 For more information on these datasets, available versions and their names, see: https://ucdp.uu.se/apidocs/.
 
 Currently the package only allows complete downloads of each dataset, filtering and subsetting (e.g. by date or country) is not supported.
 
 The function takes the following 3 arguments: 
+
+- `dataset`: Name of required UCDP dataset
+- `version`: Version of dataset needed
+- `pagesize`: Number of entries per query (max 1000). The UCDP API divides dataset into N pages of size S,
+the query loops over all pages until full dataset is retrieved.
 
 #### Examples
 ```r
