@@ -19,8 +19,8 @@
 #' @export
 #'
 #' @examples
-#' getUCDPData(dataset = ucdpprioconflict, version = "22.1", pagesize = 100)
-#' getUCDPData(dataset = gedevents, version = "22.1", pagesize = 100)
+#' getUcdpData(dataset = ucdpprioconflict, version = "22.1", pagesize = 100)
+#' getUcdpData(dataset = gedevents, version = "22.1", pagesize = 100)
 getUcdpData <- function(dataset, version, pagesize = 100){
 
   ## Stop if requested pagesize greater than 1000
