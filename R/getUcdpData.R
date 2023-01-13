@@ -33,11 +33,11 @@ getUcdpData <- function(dataset, version, pagesize = 100){
                      "onesided", "gedevents")
 
   dataset.labels <- c("UCDP armed conflict dataset",
-                                      "UCDP battle-related deaths dataset",
-                                      "UCDP dyadic dataset",
-                                      "UCDP non-state conflict dataset",
-                                      "UCDP one-sided violence dataset",
-                                      "UCDP georeferenced event dataset")
+                      "UCDP battle-related deaths dataset",
+                      "UCDP dyadic dataset",
+                      "UCDP non-state conflict dataset",
+                      "UCDP one-sided violence dataset",
+                      "UCDP georeferenced event dataset")
 
   dataset.string <- paste(paste0("'", dataset.names, "'"), collapse = ", ")
 
@@ -100,4 +100,5 @@ getUcdpData <- function(dataset, version, pagesize = 100){
   ## Return output dataframe
   return(outdata.df)
 }
+
 

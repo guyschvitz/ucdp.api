@@ -10,7 +10,8 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     dplyr, 
-    httr
+    httr,
+    curl
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
