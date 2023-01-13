@@ -41,10 +41,10 @@ the query loops over all pages until full dataset is retrieved.
 osv.df <- getUcdpData(dataset = "onesided", version = "22.1", pagesize = 1000)
 
 ## Load GED data (version 22.1, released Jul 2022)
-dyd.df <- getUcdpData(dataset = "gedevents", version = "22.1", pagesize = 1000)
+ged.df <- getUcdpData(dataset = "gedevents", version = "22.1", pagesize = 1000)
 
 ## Load GED candidate event data for Nov 2022 (version 22.0.11, released Dec 2022)
-dyd.df <- getUcdpData(dataset = "gedevents", version = "22.0.11", pagesize = 1000)
+gedc.df <- getUcdpData(dataset = "gedevents", version = "22.0.11", pagesize = 1000)
 ```
 
 ## `pingUrl`: Helper function to check internet connection and URL/API Query
