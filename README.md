@@ -1,4 +1,4 @@
-# dprtools
+# ucdp.api
 Guy Schvitz, 13. Jan 2023
 
 This package allows users to load data from the Uppsala Conflict Database Program (UCDP) API directly into R. Available datasets include: UCDP/PRIO armed conflict, Battle-related deaths, Dyadic conflict, Non-state conflict, One-sided violence, Georeferenced Events Data (GED) and the GED candidate events datasets. For more information on these datasets, see: https://ucdp.uu.se/apidocs/
@@ -47,3 +47,9 @@ dyd.df <- getUcdpData(dataset = "gedevents", version = "22.0.11", pagesize = 100
 ## `pingUrl`: Helper function to check internet connection and URL/API Query
 This function is called from within `getUcdpData` to check if the API can respond to the query entered by the user. 
 If there is no response, this is either due to problems with the internet connection, the user's proxy settings or because the specified query / URL is invalid. The error message includes an HTTP error code which may help identify the issue. 
+
+#### Examples
+```r
+pingUrl("www.google.com") ## Works, no error
+pingUrl("www.goooogle.com") ## Does not work, will stop function and return an error
+```
