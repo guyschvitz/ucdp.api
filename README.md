@@ -1,21 +1,7 @@
 # ucdp.api
 Guy Schvitz, 13. Jan 2023
 
-This package allows users to load data from the Uppsala Conflict Database Program (UCDP) API directly into R. 
-
-Available datasets include: UCDP/PRIO armed conflict, Battle-related deaths, Dyadic conflict, Non-state conflict, One-sided violence, Georeferenced Events Data (GED) and the GED candidate events datasets. 
-
-## Installation
-You can install the package as follows:
-
-```r
-library(devtools)
-devtools::install_github("guyschvitz/ucdp.api")
-```
-You also need the `dplyr` and `httr` packages. R will try to install these dependencies if not already installed.
-
-## `getUcdpData`: Load UCDP data from the API
-This function allows users to download one of the following datasets:
+This package allows users to load data from the Uppsala Conflict Database Program (UCDP) API directly into R. Available datasets include:
 
 #### Yearly data
 - Armed conflict dataset (State-based conflict)
@@ -32,6 +18,16 @@ For more information on these datasets, available versions and their names, see:
 
 Currently the package only allows complete downloads of each dataset, filtering and subsetting (e.g. by date or country) is not supported.
 
+## Installation
+You can install the package as follows:
+
+```r
+library(devtools)
+devtools::install_github("guyschvitz/ucdp.api")
+```
+You also need the `dplyr` and `httr` packages. R will try to install these dependencies if not already installed.
+
+## `getUcdpData`: Load UCDP data from the API
 The function takes the following 3 arguments: 
 
 - `dataset`: Name of required UCDP dataset
