@@ -29,11 +29,6 @@
 #'
 checkUcdpAvailable <- function(dataset, version){
 
-  ## Stop if requested pagesize greater than 1000
-  if(pagesize > 1000){
-    stop("Page size cannot exceed 1000")
-  }
-
   ## Check if dataset name is valid
   dataset.names <- c("ucdpprioconflict", "battledeaths", "dyadic", "nonstate",
                      "onesided", "gedevents")
@@ -45,7 +40,7 @@ checkUcdpAvailable <- function(dataset, version){
                  dataset.string))
   }
 
-  ## Build initial URL: Insert dataset number, version and pagesize
+  ## Build initial URL: Insert dataset and version number
   url <- sprintf("https://ucdpapi.pcr.uu.se/api/%s/%s?pagesize=100",
                  dataset, version)
 
