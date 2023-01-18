@@ -59,7 +59,7 @@ The following two arguments are needed:
 ## Check if version "22.1" of the GED data is available
 checkUcdpAvailable(dataset = "gedevents", version = "22.1")
 
-# dataset version exists
+#     dataset version exists
 # 1 gedevents    22.1   TRUE
 
 ## Check which monthly UCDP GED candidate datasets are available (status as of 2023-01-18)
