@@ -21,6 +21,9 @@
 #' @return data.frame with requested UCDP dataset
 #' @export
 #'
+#' @importFrom httr GET content
+#' @importFrom dplyr bind_rows mutate_if
+#'
 #' @examples
 #' getUcdpData(dataset = ucdpprioconflict, version = "22.1", pagesize = 100)
 #' getUcdpData(dataset = gedevents, version = "22.1", pagesize = 100)

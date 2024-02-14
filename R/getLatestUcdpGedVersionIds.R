@@ -11,6 +11,9 @@
 #' @return A data.frame listing the latest available versions of the UCDP GED dataset.
 #' @export
 #'
+#' @importFrom stringr str_extract
+#' @importFrom lubridate floor_date
+#'
 #' @examples
 #' # Get the latest UCDP GED version IDs using the current system date
 #' getLatestUcdpGedVersionIds()
@@ -69,7 +72,7 @@ getLatestUcdpGedVersionIds <- function(date = Sys.Date()){
 
   ## Check which datasets exist and keep only those dataset names
   version.df$exists <- sapply(1:nrow(version.df), function(x) {
-    ucdp.api::checkUcdpAvailable(dataset = "gedevents", version = version.df$version[x],
+    checkUcdpAvailable(dataset = "gedevents", version = version.df$version[x],
                                  as.vector = TRUE)
   })
 
