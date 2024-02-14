@@ -61,7 +61,7 @@ getFullUcdpGedData <- function(date = Sys.Date(), candidate.only = FALSE){
   ## ... Check if data contains any gaps
   ged.dates <- unique(as.Date(ged.full.df$date_start))
   all.dates <- seq(min(ged.dates), max(ged.dates),"1 day")
-  na.dates <- as.Date(setdiff(all.dates, ged.dates))
+  na.dates <- all.dates[!all.dates %in% ged.dates]
   n.na.dates <- length(na.dates)
   versions <- paste(unique(ged.full.df$version), collapse = ", ")
 
