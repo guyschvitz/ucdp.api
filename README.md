@@ -150,7 +150,11 @@ Note: Downloading the full UCDP GED dat can take some time, depending on your co
 
 #### Examples
 ```r
+## Get complete UCDP dataset up until latest monthly update (this takes a long time)
 getFullUcdpGedData()
+
+## Skip downloading latest yearly dataset to save time
+getFullUcdpGedData(candidate.only = TRUE)
 ```
 
 ## `pingUrl`: Helper function to check internet connection and URL/API Query
