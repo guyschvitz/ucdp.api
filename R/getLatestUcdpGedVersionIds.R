@@ -9,6 +9,7 @@
 #' versions. Defaults to the current system date.
 #'
 #' @return A data.frame listing the latest available versions of the UCDP GED dataset.
+#' @export
 #'
 #' @examples
 #' # Get the latest UCDP GED version IDs using the current system date

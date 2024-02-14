@@ -11,6 +11,7 @@
 #' release of final GED data, which can take a long time to complete.
 #'
 #' @return A data.frame listing the latest available versions of the UCDP GED dataset.
+#' @export
 #'
 #' @examples
 #' # Get the latest UCDP GED data using the current system date
