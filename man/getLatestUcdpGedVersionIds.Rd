@@ -2,7 +2,7 @@
 % Please edit documentation in R/getLatestUcdpGedVersionIds.R
 \name{getLatestUcdpGedVersionIds}
 \alias{getLatestUcdpGedVersionIds}
-\title{getLatestUcdpGedVersionIds: Get version IDs of latest available UCDP GED datasets}
+\title{getLatestUcdpGedVersionIds: Get version IDs of latest available UCDP GED datasets.}
 \usage{
 getLatestUcdpGedVersionIds(date = Sys.Date())
 }

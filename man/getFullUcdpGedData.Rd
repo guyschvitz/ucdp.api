@@ -2,14 +2,18 @@
 % Please edit documentation in R/getFullUcdpGedData.R
 \name{getFullUcdpGedData}
 \alias{getFullUcdpGedData}
-\title{getFullUcdpGedData: Function to download full Ucdp GED data up to a user-
-specified release date.}
+\title{getFullUcdpGedData: Wrapper function to download full UCDP GED data up to the
+latest release (default) or a user-specified release date.}
 \usage{
-getFullUcdpGedData(date = Sys.Date())
+getFullUcdpGedData(date = Sys.Date(), candidate.only = FALSE)
 }
 \arguments{
 \item{date}{A date object defining the reference date for retrieving the latest dataset
 versions. Defaults to the current system date.}
+
+\item{candidate.only}{Boolean: If set to TRUE, the call will only download the latest
+monthly and quarterly candidate datasets, and skip downloading the latest yearly
+release of final GED data, which can take a long time to complete.}
 }
 \value{
 A data.frame listing the latest available versions of the UCDP GED dataset.
