@@ -42,7 +42,7 @@ getUcdpData <- function(dataset, version, pagesize = 100, max.retries = 10) {
   url <- sprintf("https://ucdpapi.pcr.uu.se/api/%s/%s?pagesize=%s",
                  dataset, version, pagesize)
 
-  message("Checking if dataset exists...")
+  message(sprintf("Checking if dataset '%s' %s exists...", dataset, version))
 
   ## Attempt initial download with retries
   attempt <- 1

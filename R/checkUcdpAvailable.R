@@ -63,6 +63,9 @@ checkUcdpAvailable <- function(dataset, version, as.vector = FALSE){
   if(as.vector){
     return(exists)
   } else {
+    out.df <- data.frame("dataset" = dataset,
+                         "version" = version,
+                         "exists" = exists)
     return(out.df)
   }
 }

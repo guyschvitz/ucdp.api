@@ -1,4 +1,4 @@
-#' getLatestUcdpGedVersionIds: Get version IDs of latest available UCDP GED datasets
+#' getLatestUcdpGedVersionIds: Get version IDs of latest available UCDP GED datasets.
 #'
 #' This function queries the UCDP GED API to retrieve version IDs of the latest
 #' available UCDP GED datasets. It fetches the version IDs required to download
@@ -24,6 +24,7 @@ getLatestUcdpGedVersionIds <- function(date = Sys.Date()){
   ## ... Extract year from current date
   date <- as.Date(date)
   yr <- as.numeric(format(date, "%y"))
+  mon <- as.numeric(format(date, "%m"))
 
   ## ... Also include previous yearly data in case current year version has
   ## ... Not been released yet (released around June/July)
@@ -54,15 +55,21 @@ getLatestUcdpGedVersionIds <- function(date = Sys.Date()){
 
   ## Code additional variables
   ## ... Year label
-  version.df$yr <- substr(version.df$version, 1,2)
+  version.df$yr <- as.numeric(substr(version.df$version, 1,2))
 
   ## ... Month label
   version.df$mon <- as.numeric(stringr::str_extract(version.df$version, "[0-9]{1,}$"))
 
+  ## ... Add reference date label
+  version.df$ref_date <- as.Date(sprintf("20%s-%s-1", version.df$yr, version.df$mon))
+
+  ## Keep only dataset versions up to user-specified end-date
+  version.df <- version.df[version.df$ref_date < lubridate::floor_date(date, "months"),]
+
   ## Check which datasets exist and keep only those dataset names
   version.df$exists <- sapply(1:nrow(version.df), function(x) {
-    checkUcdpAvailable(dataset = "gedevents", version = version.df$version[x],
-                       as.vector = TRUE)
+    ucdp.api::checkUcdpAvailable(dataset = "gedevents", version = version.df$version[x],
+                                 as.vector = TRUE)
   })
 
   ## ... Keep only existing datasets
@@ -80,17 +87,23 @@ getLatestUcdpGedVersionIds <- function(date = Sys.Date()){
 
   ## Keep only required quarterly update:
   keep.q.df <- subset(version.df, update == "quarterly")
-  keep.q.df <- subset(keep.q.df, yr == max(yr) & mon == max(mon))
+  keep.q.df <- subset(keep.q.df, yr == max(yr))
+  keep.q.df <- subset(keep.q.df, mon == max(mon))
 
   ## Keep only required monthly update:
   keep.m.df <- subset(version.df, update == "monthly")
-  keep.m.df <- subset(keep.m.df,
-                      ## Case 1: Monthly update is from year after latest
-                      ## Quarterly update
-                      yr > keep.q.df$yr |
-                        ## Case 2: Monthly update is from month after latest
-                        ## Quarterly update in the same year
-                        yr == keep.q.df$yr & mon > keep.q.df$mon)
+
+  if(max(keep.m.df$yr) > keep.q.df$yr){
+    ## Case 1: Monthly update is from year after latest
+    ## Quarterly update
+    keep.m.df <- subset(keep.m.df, yr > keep.q.df$yr)
+  } else {
+    ## Case 2: Monthly update is from month after latest
+    ## Quarterly update in the same year
+    keep.m.df <- subset(keep.m.df, yr == keep.q.df$yr)
+    keep.m.df <- subset(keep.m.df, mon > keep.q.df$mon)
+
+  }
 
   ## Compile final UCDP GED version ids
   version.df <- unique(rbind(keep.yr.df, keep.q.df, keep.m.df))

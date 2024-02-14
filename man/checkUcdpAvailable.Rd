@@ -4,7 +4,7 @@
 \alias{checkUcdpAvailable}
 \title{checkUcdpAvailable: Check which UCDP datasets are currently available}
 \usage{
-checkUcdpAvailable(dataset, version)
+checkUcdpAvailable(dataset, version, as.vector = FALSE)
 }
 \arguments{
 \item{dataset}{character. Name of UCDP dataset. Needs to be one of the following:
@@ -17,6 +17,8 @@ For more information, see: https://ucdp.uu.se/apidocs/}
 For yearly UCDP data: Format: YY.1 (e.g. 22.1 for data released in 2022)
 For monthly UCDP GED data use format: YY.0.MM (e.g. 22.0.11 for data on November 2022)
 For quarterly UCDP releases data use format: YY.01.YY.MM (e.g. 22.01.22.09 for data from Jan to Sep 2022)}
+
+\item{as.vector}{boolean: Return output as multi-column data.frame (FALSE) or as simple vector (TRUE)? Default: FALSE}
 }
 \value{
 data.frame with requested UCDP dataset

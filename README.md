@@ -56,47 +56,99 @@ The following two arguments are needed:
 
 #### Examples
 ```r
-## Check if version "22.1" of the GED data is available
-checkUcdpAvailable(dataset = "gedevents", version = "22.1")
+## Check if version "23.1" of the GED data is available
+checkUcdpAvailable(dataset = "gedevents", version = "23.1")
 
 #     dataset version exists
-# 1 gedevents    22.1   TRUE
+# 1 gedevents    23.1   TRUE
+
+## Return results as boolean vector
+checkUcdpAvailable(dataset = "gedevents", version = "23.1", as.vector = TRUE)
+
+# [1] TRUE
 
 ## Check which monthly UCDP GED candidate datasets are available (status as of 2023-01-18)
 ## ... Generate month ids (1 to 12)
 m.ids <- 1:12
 ## ... Loop over month ids
 do.call(rbind, lapply(m.ids, function(x){
-  checkUcdpAvailable("gedevents", sprintf("22.0.%s", x))
+  checkUcdpAvailable("gedevents", sprintf("23.0.%s", x))
 }))
 
 #     dataset version exists
-# 1  gedevents  22.0.1   TRUE
-# 2  gedevents  22.0.2   TRUE
-# 3  gedevents  22.0.3   TRUE
-# 4  gedevents  22.0.4   TRUE
-# 5  gedevents  22.0.5   TRUE
-# 6  gedevents  22.0.6   TRUE
-# 7  gedevents  22.0.7   TRUE
-# 8  gedevents  22.0.8   TRUE
-# 9  gedevents  22.0.9   TRUE
-# 10 gedevents 22.0.10   TRUE
-# 11 gedevents 22.0.11   TRUE
-# 12 gedevents 22.0.12  FALSE
+# 1  gedevents  23.0.1   TRUE
+# 2  gedevents  23.0.2   TRUE
+# 3  gedevents  23.0.3   TRUE
+# 4  gedevents  23.0.4   TRUE
+# 5  gedevents  23.0.5   TRUE
+# 6  gedevents  23.0.6   TRUE
+# 7  gedevents  23.0.7   TRUE
+# 8  gedevents  23.0.8   TRUE
+# 9  gedevents  23.0.9   TRUE
+# 10 gedevents 23.0.10   TRUE
+# 11 gedevents 23.0.11   TRUE
+# 12 gedevents 23.0.12  FALSE
 
 ## Check which quarterly UCDP GED candidate datasets are available
 ## ... Generate quarter ids (3, 9 and 12)
 q.ids <- sprintf("%02d", seq(3, 12, 3))
 ## ... Loop over quarter ids
 do.call(rbind, lapply(q.ids, function(x){
-  checkUcdpAvailable("gedevents", sprintf("22.01.22.%s", x))
+  checkUcdpAvailable("gedevents", sprintf("23.01.23.%s", x))
 }))
 
 #     dataset     version exists
-# 1 gedevents 22.01.22.03   TRUE
-# 2 gedevents 22.01.22.06   TRUE
-# 3 gedevents 22.01.22.09   TRUE
-# 4 gedevents 22.01.22.12  FALSE
+# 1 gedevents 23.01.23.03   TRUE
+# 2 gedevents 23.01.23.06   TRUE
+# 3 gedevents 23.01.23.09   TRUE
+# 4 gedevents 23.01.23.12  FALSE
+```
+
+## `getLatestUcdpGedVersionIds.R`: Get version IDs of latest available UCDP GED datasets
+This function queries the UCDP GED API to retrieve version IDs of the latest available UCDP GED datasets. It fetches the version IDs required to download the full UCDP GED data (final and candidate), covering January 1989 until the month prior to the latest update.
+
+#### Examples
+```
+## Get latest version ids for UCDP GED data (reference date: current date)
+getLatestUcdpGedVersionIds()
+
+#     dataset      type    update     version exists
+# 2  gedevents     final    yearly        23.1   TRUE
+# 26 gedevents candidate quarterly 23.01.23.12   TRUE
+
+
+## Get UCDP GED version ids up to user-specified dates
+getLatestUcdpGedVersionIds(date = "2023-05-01")
+
+#     dataset      type    update     version exists
+# 1 gedevents     final    yearly        23.1   TRUE
+# 6 gedevents candidate quarterly 23.01.23.04   TRUE
+
+getLatestUcdpGedVersionIds("2023-04-01")
+
+#      dataset      type    update     version exists
+# 1  gedevents     final    yearly        23.1   TRUE
+# 26 gedevents candidate quarterly 22.01.22.12   TRUE
+# 27 gedevents candidate   monthly      23.0.1   TRUE
+# 28 gedevents candidate   monthly      23.0.2   TRUE
+# 29 gedevents candidate   monthly      23.0.3   TRUE
+
+getLatestUcdpGedVersionIds("2022-12-01")
+
+#      dataset      type    update     version exists
+# 1  gedevents     final    yearly        22.1   TRUE
+# 11 gedevents candidate quarterly 22.01.22.09   TRUE
+# 36 gedevents candidate   monthly     22.0.10   TRUE
+# 37 gedevents candidate   monthly     22.0.11   TRUE
+
+```
+
+## `getFullUcdpGedData.R`: Download complete UCDP GED data up to latest available release
+This wrapper function downloads the full UCDP GED data up to the latest release (default) or a user-specified release date.
+
+#### Examples
+```r
+getFullUcdpGedData()
 ```
 
 ## `pingUrl`: Helper function to check internet connection and URL/API Query

@@ -1,5 +1,5 @@
-#' getFullUcdpGedData: Function to download full Ucdp GED data up to a user-
-#' specified release date.
+#' getFullUcdpGedData: Wrapper function to download full UCDP GED data up to the
+#' latest release (default) or a user-specified release date.
 #'
 #' Note: Final date of data coverage is always one month prior to the UCDP
 #' release date.
@@ -24,29 +24,28 @@ getFullUcdpGedData <- function(date = Sys.Date()){
     query.df <- getUcdpData(dataset = ged.version.df$dataset[x],
                             version = ged.version.df$version[x])
     query.df$update <- ged.version.df$update[x]
-    query.df$query <- x
+    query.df$source <- ged.version.df$version[x]
     return(query.df)
   })
 
   ## Combine list into data.frame
-  ged.df <- do.call("rbind", ged.ls)
+  ged.full.df <- do.call("rbind", ged.ls)
 
   ## Handling potential duplicates
+  ## (if an event entry is updated from one release to the next, keep only the
+  ## latest version of the event entry)
+
   ## ... Arrange combined data frame by 'id' and in descending order of 'query'
   ged.full.df <- ged.full.df[order(ged.full.df$id, -ged.full.df$query), ]
 
-  ## ... Add a column 'dupl' for duplicates and mark the first occurrence
-  ged.full.df$dupl <- ave(ged.full.df$id, ged.full.df$id,
-                          FUN = function(x){length(x) > 1})
+  ## ... Add a column 'rn' to count observations for each event id
+  ged.full.df$rn <- ave(rep(1, nrow(ged.full.df)), ged.full.df$id, FUN = seq_along)
 
-  ## ... Convert logical to actual TRUE/FALSE values for clarity
-  ged.full.df$dupl <- ged.full.df$dupl == "TRUE"
-
-  ## ... Subset the data frame to keep only the first occurrences
-  ged.full.df <- ged.full.df[!duplicated(ged.full.df$id), ]
+  ## ... Subset the data frame to keep only the first occurrences of each event id
+  ged.full.df <- ged.full.df[ged.full.df$rn == 1, ]
 
   ## ... Remove temporary columns 'query' and 'dupl'
-  ged.full.df <- ged.full.df[, !(names(ged.full.df) %in% c("query", "dupl"))]
+  ged.full.df <- ged.full.df[, !(names(ged.full.df) %in% c("rn"))]
 
   return(ged.full.df)
 }

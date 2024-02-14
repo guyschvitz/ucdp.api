@@ -4,7 +4,7 @@
 \alias{getUcdpData}
 \title{getUcdpData: Download data from the Uppsala Conflict Database Program API.}
 \usage{
-getUcdpData(dataset, version, pagesize = 100)
+getUcdpData(dataset, version, pagesize = 100, max.retries = 10)
 }
 \arguments{
 \item{dataset}{character. Name of UCDP dataset. Needs to be one of the following:
@@ -18,9 +18,13 @@ For yearly UCDP data: Format: YY.1 (e.g. 22.1 for data released in 2022)
 For monthly UCDP GED data use format: YY.0.MM (e.g. 22.0.11 for data on November 2022)
 For quarterly UCDP releases data use format: YY.01.YY.MM (e.g. 22.01.22.09 for data from Jan to Sep 2022)}
 
-\item{pagesize}{Page size of each individual query. Default: 100. Max: 1000
+\item{pagesize}{numeric. Page size of each individual query. Default: 100. Max: 1000
 The UCDP API divides dataset into N pages of size S,
 the query loops over all pages until full dataset is retrieved.}
+
+\item{max.retries}{numeric (integer). Maximum number of retry attempts for API
+calls in case of failure, default: 10. Useful for managing temporary network or server issues.
+Exceeding max.retries stops the function with an error.}
 }
 \value{
 data.frame with requested UCDP dataset

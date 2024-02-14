@@ -1,7 +1,7 @@
 Package: ucdp.api
 Type: Package
 Title: Download data from the Uppsala Conflict Database Program (UCDP) API
-Version: 0.1.0
+Version: 0.2.0
 Author: Guy Schvitz <guy.schvitz@ec.europa.eu>
 Maintainer: Guy Schvitz <guy.schvitz@ec.europa.eu>
 Description: This package allows users to load data from the Uppsala Conflict Database Program (UCDP) API directly into R. Available datasets include: UCDP/PRIO armed conflict, Battle-related deaths, Dyadic conflict, Non-state conflict, One-sided violence, Georeferenced Events Data (GED) and the GED candidate events datasets. For more information on available datasets, see: https://ucdp.uu.se/apidocs/
@@ -11,6 +11,7 @@ LazyData: true
 Imports: 
     dplyr, 
     httr,
+    stringr,
     curl
 Suggests: 
     testthat (>= 3.0.0)
