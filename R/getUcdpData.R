@@ -11,9 +11,12 @@
 #' For monthly UCDP GED data use format: YY.0.MM (e.g. 22.0.11 for data on November 2022)
 #' For quarterly UCDP releases data use format: YY.01.YY.MM (e.g. 22.01.22.09 for data from Jan to Sep 2022)
 #'
-#' @param pagesize Page size of each individual query. Default: 100. Max: 1000
+#' @param pagesize numeric. Page size of each individual query. Default: 100. Max: 1000
 #' The UCDP API divides dataset into N pages of size S,
 #' the query loops over all pages until full dataset is retrieved.
+#' @param max.retries numeric (integer). Maximum number of retry attempts for API
+#' calls in case of failure, default: 10. Useful for managing temporary network or server issues.
+#' Exceeding max.retries stops the function with an error.
 #'
 #' @return data.frame with requested UCDP dataset
 #' @export
@@ -21,83 +24,91 @@
 #' @examples
 #' getUcdpData(dataset = ucdpprioconflict, version = "22.1", pagesize = 100)
 #' getUcdpData(dataset = gedevents, version = "22.1", pagesize = 100)
-getUcdpData <- function(dataset, version, pagesize = 100){
+getUcdpData <- function(dataset, version, pagesize = 100, max.retries = 10) {
 
-  ## Stop if requested pagesize greßater than 1000
-  if(pagesize > 1000){
+  if(pagesize > 1000) {
     stop("Page size cannot exceed 1000")
   }
 
-  ## Check if dataset name is valid
+  ## Validate dataset name
   dataset.names <- c("ucdpprioconflict", "battledeaths", "dyadic", "nonstate",
                      "onesided", "gedevents")
 
-  dataset.labels <- c("UCDP armed conflict dataset",
-                      "UCDP battle-related deaths dataset",
-                      "UCDP dyadic dataset",
-                      "UCDP non-state conflict dataset",
-                      "UCDP one-sided violence dataset",
-                      "UCDP georeferenced event dataset")
-
-  dataset.string <- paste(paste0("'", dataset.names, "'"), collapse = ", ")
-
-  if(!dataset %in% dataset.names){
-    stop(sprintf("dataset name needs to be one of the following:\n%s",
-                 dataset.string))
+  if(!dataset %in% dataset.names) {
+    stop("Invalid dataset name. Please choose one of the predefined datasets.")
   }
 
-  ## Build initial URL: Insert dataset number, version and pagesize
+  ## Build initial URL
   url <- sprintf("https://ucdpapi.pcr.uu.se/api/%s/%s?pagesize=%s",
                  dataset, version, pagesize)
 
-  ## Check if URL is valid
-  pingUrl(url)
+  message("Checking if dataset exists...")
 
-  ## Get initial response and content
-  response <- httr::GET(url)
-  content.ls <- httr::content(response, encoding = "UTF-8")
-  outdata.ls <- content.ls$Result
-
-  ## Get total number of pages needed to retrieve complete dataset
-  pages <- content.ls$TotalPages
-
-  ## Get url of next page
-  nxt.url <- content.ls$NextPageUrl
-
-  ## Loop over remaining pages and append results
-  ## Stops if NextPageUrl does not exist (empty string)
-  while(content.ls$NextPageUrl != ""){
-    ## Get content of next page
-    response <- httr::GET(content.ls$NextPageUrl)
-    content.ls <- httr::content(response, encoding = "UTF-8")
-    ## Append content from next page to content from previous n pages
-    outdata.ls <- c(outdata.ls, content.ls$Result)
+  ## Attempt initial download with retries
+  attempt <- 1
+  while(attempt <= max.retries) {
+    tryCatch({
+      response <- httr::GET(url)
+      content.ls <- httr::content(response, encoding = "UTF-8")
+      break # Exit loop on success
+    }, error = function(e) {
+      if(attempt == max.retries) {
+        stop("Failed to retrieve data after ", attempt, " attempts.")
+      }
+      attempt <- attempt + 1
+      Sys.sleep(5) # Wait before retrying
+    })
   }
 
-  ## Output results as dataframe
-  outdata.df <- dplyr::bind_rows(lapply(outdata.ls, unlist))
+  ## Initialize list and define number of pages with first page results
+  pages <- content.ls$TotalPages
+  outdata.ls <- list(content.ls$Result)
 
-  ## Convert true numeric character columns to numeric
-  ## ... Function to identify numeric columns
-  isNumeric <- function(x){
+  message(sprintf("\nGetting UCDP '%s' dataset, Version %s...", dataset, version))
+  ## Initialize progress bar
+  pb <- txtProgressBar(min = 0, max = pages, style = 3)
+
+  ## Loop over pages and handle retries
+  for(page in 2:pages) {
+    ## ... Reset attempt counter for each page
+    attempt <- 1
+    while(attempt <= max.retries) {
+      tryCatch({
+        nxt.url <- sprintf("%s&page=%s", url, page)
+        ## ... Send query and fetch results
+        response <- httr::GET(nxt.url)
+        content.ls <- httr::content(response, encoding = "UTF-8")
+        ## ... Append results
+        outdata.ls[[page]] <- content.ls$Result
+        ## ... Update progress bar
+        setTxtProgressBar(pb, page)
+        ## ... Exit loop on success
+        break
+      }, error = function(e) {
+        if(attempt == max.retries) {
+          ## ... Close progress bar on final attempt
+          close(pb)
+          stop("Failed to retrieve page ", page, " after ",
+               attempt, " attempts.")
+        }
+        attempt <- attempt + 1
+        ## ... Wait before retrying
+        Sys.sleep(3)
+      })
+    }
+  }
+  close(pb)
+
+  ## Process and return the data
+  outdata.df <- dplyr::bind_rows(lapply(outdata.ls, dplyr::bind_rows))
+
+  ## Convert numeric columns
+  isNumeric <- function(x) {
     all(suppressWarnings(!is.na(as.numeric(na.omit(x)))))
   }
-
-  ## ... Apply function to all columns (only converts true numeric columns)
   outdata.df <- dplyr::mutate_if(outdata.df, isNumeric, as.numeric)
 
-  # Generate output message
-  data.lbl <- dataset.labels[dataset.names == dataset]
-  candidate.data <- !grepl("^[0-9]{2}\\.[0-9]{1}$", version) & dataset == "gedevents"
+  message("Done.")
 
-  if(candidate.data){
-    data.lbl <- sprintf("%s (%s)", data.lbl, "Candidate events")
-  }
-
-  # Print output message
-  message(sprintf("Retrieved %s, Version %s.", data.lbl, version))
-
-  ## Return output dataframe
   return(outdata.df)
 }
-

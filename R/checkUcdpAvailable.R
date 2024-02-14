@@ -11,6 +11,8 @@
 #' For monthly UCDP GED data use format: YY.0.MM (e.g. 22.0.11 for data on November 2022)
 #' For quarterly UCDP releases data use format: YY.01.YY.MM (e.g. 22.01.22.09 for data from Jan to Sep 2022)
 #'
+#' @param as.vector boolean: Return output as multi-column data.frame (FALSE) or as simple vector (TRUE)? Default: FALSE
+#'
 #' @return data.frame with requested UCDP dataset
 #' @export
 #'
@@ -27,7 +29,7 @@
 #'   checkUcdpAvailable("gedevents", sprintf("22.01.22.%s", x))
 #'   }))
 #'
-checkUcdpAvailable <- function(dataset, version){
+checkUcdpAvailable <- function(dataset, version, as.vector = FALSE){
 
   ## Check if dataset name is valid
   dataset.names <- c("ucdpprioconflict", "battledeaths", "dyadic", "nonstate",
@@ -56,7 +58,11 @@ checkUcdpAvailable <- function(dataset, version){
     exists <- T
   }
 
+
   ## Collect name of data, version and result of ping
-  out.df <- data.frame(dataset, version, exists)
-  return(out.df)
+  if(as.vector){
+    return(exists)
+  } else {
+    return(out.df)
+  }
 }
