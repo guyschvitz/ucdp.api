@@ -6,6 +6,10 @@
 #'
 #' @param date A date object defining the reference date for retrieving the latest dataset
 #' versions. Defaults to the current system date.
+#' @param candidate.only Boolean: If set to TRUE, the call will only download the latest
+#' monthly and quarterly candidate datasets, and skip downloading the latest yearly
+#' release of final GED data, which can take a long time to complete.
+#'
 #' @return A data.frame listing the latest available versions of the UCDP GED dataset.
 #'
 #' @examples
@@ -14,17 +18,23 @@
 #'
 #' # Get the latest UCDP GED data using a specific date
 #' getFullUcdpGedData(as.Date("2022-12-31"))
-getFullUcdpGedData <- function(date = Sys.Date()){
+getFullUcdpGedData <- function(date = Sys.Date(), candidate.only = FALSE){
 
   ## Get list of latest available GED datasets
   ged.version.df <- getLatestUcdpGedVersionIds(date = date)
+
+  ## If candidate.only == TRUE, skip downloading yearly data
+  if(candidate.only == TRUE){
+    ged.version.df <- ged.version.df[!grepl("yearly", ged.version.df$update),]
+  }
 
   ## Loop through list and download datasets
   ged.ls <- lapply(1:nrow(ged.version.df), function(x){
     query.df <- getUcdpData(dataset = ged.version.df$dataset[x],
                             version = ged.version.df$version[x])
     query.df$update <- ged.version.df$update[x]
-    query.df$source <- ged.version.df$version[x]
+    query.df$version <- ged.version.df$version[x]
+    query.df$query <- x
     return(query.df)
   })
 
@@ -45,7 +55,22 @@ getFullUcdpGedData <- function(date = Sys.Date()){
   ged.full.df <- ged.full.df[ged.full.df$rn == 1, ]
 
   ## ... Remove temporary columns 'query' and 'dupl'
-  ged.full.df <- ged.full.df[, !(names(ged.full.df) %in% c("rn"))]
+  ged.full.df <- ged.full.df[, !(names(ged.full.df) %in% c("rn", "query"))]
+
+  ## ... Check if data contains any gaps
+  ged.dates <- unique(as.Date(ged.full.df$date_start))
+  all.dates <- seq(min(ged.dates), max(ged.dates),"1 day")
+  na.dates <- as.Date(setdiff(all.dates, ged.dates))
+  n.na.dates <- length(na.dates)
+  versions <- paste(unique(ged.full.df$version), collapse = ", ")
+
+  ## ... Print info and warning messages
+  message(sprintf("Compiled GED datasets: %s.", versions))
+  message(sprintf("Data coverage: %s to %s", min(ged.dates), max(ged.dates)))
+  if(n.na.dates > 0){
+    warning(sprintf("The following %1.0f dates are missing from 'date_start' column:\n%s.",
+                    n.na.dates, paste(na.dates, collapse = ", ")))
+  }
 
   return(ged.full.df)
 }

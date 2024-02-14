@@ -146,6 +146,8 @@ getLatestUcdpGedVersionIds("2022-12-01")
 ## `getFullUcdpGedData.R`: Download complete UCDP GED data up to latest available release
 This wrapper function downloads the full UCDP GED data up to the latest release (default) or a user-specified release date.
 
+Note: Downloading the full UCDP GED dat can take some time, depending on your connection, server traffic, network congestion etc.
+
 #### Examples
 ```r
 getFullUcdpGedData()
