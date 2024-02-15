@@ -1,16 +1,18 @@
 #' getFullUcdpGedData: Wrapper function to download full UCDP GED data up to the
 #' latest release (default) or a user-specified release date.
 #'
-#' Note: Final date of data coverage is always one month prior to the UCDP
-#' release date.
-#'
 #' @param date A date object defining the reference date for retrieving the latest dataset
 #' versions. Defaults to the current system date.
-#' @param candidate.only Boolean: If set to TRUE, the call will only download the latest
-#' monthly and quarterly candidate datasets, and skip downloading the latest yearly
-#' release of final GED data, which can take a long time to complete.
 #'
-#' @return A data.frame listing the latest available versions of the UCDP GED dataset.
+#' @param candidate.only boolean. If set to TRUE, the call will only download the latest
+#' monthly and quarterly candidate datasets, and skip downloading the latest yearly
+#' release of final GED data, which can take a long time to complete. Default: FALSE
+#'
+#' @param add.metadata boolean: Add metadata variables to output dataset (TRUE)
+#' or not (FALSE)? Includes dataset name, version number, download date. Default: TRUE
+#'
+#' @return A data.frame containing the latest full UCDP GED data (final + candidate
+#' or candidate only)
 #' @export
 #'
 #' @examples
@@ -19,7 +21,8 @@
 #'
 #' # Get the latest UCDP GED data using a specific date
 #' getFullUcdpGedData(as.Date("2022-12-31"))
-getFullUcdpGedData <- function(date = Sys.Date(), candidate.only = FALSE){
+getFullUcdpGedData <- function(date = Sys.Date(), candidate.only = FALSE,
+                               add.metadata = TRUE){
 
   ## Get list of latest available GED datasets
   ged.version.df <- getLatestUcdpGedVersionIds(date = date)
@@ -33,8 +36,13 @@ getFullUcdpGedData <- function(date = Sys.Date(), candidate.only = FALSE){
   ged.ls <- lapply(1:nrow(ged.version.df), function(x){
     query.df <- getUcdpData(dataset = ged.version.df$dataset[x],
                             version = ged.version.df$version[x])
-    query.df$update <- ged.version.df$update[x]
+    if(add.metadata == TRUE){
+    query.df$dataset <- "gedevents"
     query.df$version <- ged.version.df$version[x]
+    query.df$type <- ged.version.df$type
+    query.df$update <- ged.version.df$update[x]
+    query.df$download_date <- Sys.Date()
+    }
     query.df$query <- x
     return(query.df)
   })
@@ -57,21 +65,6 @@ getFullUcdpGedData <- function(date = Sys.Date(), candidate.only = FALSE){
 
   ## ... Remove temporary columns 'query' and 'dupl'
   ged.full.df <- ged.full.df[, !(names(ged.full.df) %in% c("rn", "query"))]
-
-  ## ... Check if data contains any gaps
-  ged.dates <- unique(as.Date(ged.full.df$date_start))
-  all.dates <- seq(min(ged.dates), max(ged.dates),"1 day")
-  na.dates <- all.dates[!all.dates %in% ged.dates]
-  n.na.dates <- length(na.dates)
-  versions <- paste(unique(ged.full.df$version), collapse = ", ")
-
-  ## ... Print info and warning messages
-  message(sprintf("Compiled GED datasets: %s.", versions))
-  message(sprintf("Data coverage: %s to %s", min(ged.dates), max(ged.dates)))
-  if(n.na.dates > 0){
-    warning(sprintf("The following %1.0f dates are missing from 'date_start' column:\n%s.",
-                    n.na.dates, paste(na.dates, collapse = ", ")))
-  }
 
   return(ged.full.df)
 }

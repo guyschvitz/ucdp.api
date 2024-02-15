@@ -1,4 +1,4 @@
-#' checkUcdpAvailable: Check which UCDP datasets are currently available
+#' checkUcdpAvailable: Check which UCDP datasets are currently available through the API.
 #'
 #' @param dataset character. Name of UCDP dataset. Needs to be one of the following:
 #' "ucdpprioconflict", "battledeaths", "dyadic", "nonstate", "onesided" (yearly data),
@@ -57,7 +57,6 @@ checkUcdpAvailable <- function(dataset, version, as.vector = FALSE){
   } else {
     exists <- T
   }
-
 
   ## Collect name of data, version and result of ping
   if(as.vector){

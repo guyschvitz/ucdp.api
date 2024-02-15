@@ -2,7 +2,7 @@
 % Please edit documentation in R/checkUcdpAvailable.R
 \name{checkUcdpAvailable}
 \alias{checkUcdpAvailable}
-\title{checkUcdpAvailable: Check which UCDP datasets are currently available}
+\title{checkUcdpAvailable: Check which UCDP datasets are currently available through the API.}
 \usage{
 checkUcdpAvailable(dataset, version, as.vector = FALSE)
 }
@@ -24,7 +24,7 @@ For quarterly UCDP releases data use format: YY.01.YY.MM (e.g. 22.01.22.09 for d
 data.frame with requested UCDP dataset
 }
 \description{
-checkUcdpAvailable: Check which UCDP datasets are currently available
+checkUcdpAvailable: Check which UCDP datasets are currently available through the API.
 }
 \examples{
 ## Check which monthly UCDP GED candidate datasets are available

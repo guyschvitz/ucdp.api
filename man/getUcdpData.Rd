@@ -4,7 +4,13 @@
 \alias{getUcdpData}
 \title{getUcdpData: Download data from the Uppsala Conflict Database Program API.}
 \usage{
-getUcdpData(dataset, version, pagesize = 100, max.retries = 10)
+getUcdpData(
+  dataset,
+  version,
+  pagesize = 100,
+  max.retries = 10,
+  add.metadata = TRUE
+)
 }
 \arguments{
 \item{dataset}{character. Name of UCDP dataset. Needs to be one of the following:
@@ -25,6 +31,9 @@ the query loops over all pages until full dataset is retrieved.}
 \item{max.retries}{numeric (integer). Maximum number of retry attempts for API
 calls in case of failure, default: 10. Useful for managing temporary network or server issues.
 Exceeding max.retries stops the function with an error.}
+
+\item{add.metadata}{boolean: Add metadata to output dataset (TRUE) or not (FALSE).
+Default: TRUE}
 }
 \value{
 data.frame with requested UCDP dataset

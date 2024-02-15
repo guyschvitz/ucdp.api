@@ -17,6 +17,8 @@
 #' @param max.retries numeric (integer). Maximum number of retry attempts for API
 #' calls in case of failure, default: 10. Useful for managing temporary network or server issues.
 #' Exceeding max.retries stops the function with an error.
+#' @param add.metadata boolean: Add metadata to output dataset (TRUE) or not (FALSE).
+#' Default: TRUE
 #'
 #' @return data.frame with requested UCDP dataset
 #' @export
@@ -27,7 +29,8 @@
 #' @examples
 #' getUcdpData(dataset = ucdpprioconflict, version = "22.1", pagesize = 100)
 #' getUcdpData(dataset = gedevents, version = "22.1", pagesize = 100)
-getUcdpData <- function(dataset, version, pagesize = 100, max.retries = 10) {
+getUcdpData <- function(dataset, version, pagesize = 100, max.retries = 10,
+                        add.metadata = TRUE) {
 
   if(pagesize > 1000) {
     stop("Page size cannot exceed 1000")
@@ -38,7 +41,8 @@ getUcdpData <- function(dataset, version, pagesize = 100, max.retries = 10) {
                      "onesided", "gedevents")
 
   if(!dataset %in% dataset.names) {
-    stop("Invalid dataset name. Please choose one of the predefined datasets.")
+    stop(sprintf("Invalid dataset name. Please choose one of the following datasets:\n%s.",
+         paste(sprintf("'%s'", dataset.names), collapse = ", ")))
   }
 
   ## Build initial URL
@@ -61,6 +65,10 @@ getUcdpData <- function(dataset, version, pagesize = 100, max.retries = 10) {
       attempt <- attempt + 1
       Sys.sleep(5) # Wait before retrying
     })
+  }
+
+  if(!is.list(content.ls)){
+    stop(content.ls)
   }
 
   ## Initialize list and define number of pages with first page results
@@ -110,6 +118,13 @@ getUcdpData <- function(dataset, version, pagesize = 100, max.retries = 10) {
     all(suppressWarnings(!is.na(as.numeric(na.omit(x)))))
   }
   outdata.df <- dplyr::mutate_if(outdata.df, isNumeric, as.numeric)
+
+  ## Add metadata if metadata == TRUE
+  if(add.metadata == TRUE){
+    outdata.df$dataset <- dataset
+    outdata.df$version <- version
+    outdata.df$download_date <- Sys.Date()
+  }
 
   message("Done.")
 
