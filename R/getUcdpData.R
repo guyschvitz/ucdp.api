@@ -9,7 +9,7 @@
 #' For yearly UCDP data: Format: YY.1 (e.g. 22.1 for data released in 2022)
 #' For monthly UCDP GED data use format: YY.0.MM (e.g. 22.0.11 for data on November 2022)
 #' For quarterly UCDP releases data use format: YY.01.YY.MM (e.g. 22.01.22.09 for data from Jan to Sep 2022)
-#' @param pagesize numeric. Page size of each individual query. Default: 100. Max: 1000
+#' @param pagesize numeric. Page size of each individual query. Default: 1000. Max: 1000
 #' The UCDP API divides dataset into N pages of size S,
 #' the query loops over all pages until full dataset is retrieved.
 #' @param max.retries numeric (integer). Maximum number of retry attempts for API
@@ -25,9 +25,9 @@
 #' @importFrom dplyr bind_rows mutate_if
 #'
 #' @examples
-#' getUcdpData(dataset = ucdpprioconflict, version = "22.1", pagesize = 100)
-#' getUcdpData(dataset = gedevents, version = "22.1", pagesize = 100)
-getUcdpData <- function(dataset, version, pagesize = 100, max.retries = 10,
+#' getUcdpData(dataset = ucdpprioconflict, version = "22.1", pagesize = 1000)
+#' getUcdpData(dataset = gedevents, version = "22.1", pagesize = 1000)
+getUcdpData <- function(dataset, version, pagesize = 1000, max.retries = 10,
                         add.metadata = TRUE) {
 
   if(pagesize > 1000) {
