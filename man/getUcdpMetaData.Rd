@@ -18,7 +18,7 @@ A text summary of the metadata or message printed to console
 \description{
 This function extracts metadata from a UCDP dataset downloaded through the
 API using the {ucdp.api} R package and prints the results as a text string
-or a console message.
+or console message.
 }
 \examples{
 ucdp.df <- read.csv("your_ucdp_data_file.csv")

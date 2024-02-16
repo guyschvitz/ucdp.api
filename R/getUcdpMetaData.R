@@ -2,7 +2,7 @@
 #'
 #' This function extracts metadata from a UCDP dataset downloaded through the
 #' API using the {ucdp.api} R package and prints the results as a text string
-#' or a console message.
+#' or console message.
 #'
 #' @param ucdp.df A data.frame containing UCDP data with expected metadata columns.
 #' @param as.text boolean: Should result be returned as text (TRUE) or printed
