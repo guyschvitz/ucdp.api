@@ -13,7 +13,7 @@ getUcdpMetaData(ucdp.df, as.text = FALSE)
 to the console (FALSE)? Default: FALSE}
 }
 \value{
-A text summary of the metadata or message printed to console
+A text summary of the metadata or message printed to console.
 }
 \description{
 This function extracts metadata from a UCDP dataset downloaded through the

@@ -8,7 +8,7 @@
 #' @param as.text boolean: Should result be returned as text (TRUE) or printed
 #' to the console (FALSE)? Default: FALSE
 #'
-#' @return A text summary of the metadata or message printed to console
+#' @return A text summary of the metadata or message printed to console.
 #' @export
 #'
 #' @examples
@@ -24,16 +24,16 @@ getUcdpMetaData <- function(ucdp.df, as.text = FALSE) {
                              "One-sided violence", "Georeferenced event"), dataset.names)
 
   ## Validate required columns and extract information
-  required.cols <- c("dataset", "version", "download.date")
+  required.cols <- c("dataset", "version", "download_date")
   if (!all(required.cols %in% names(ucdp.df))) {
     warning("Metadata variables not found, outputting only known information.")
-    dataset <- version <- "**unknown**"
+    dataset <- version <- dataset.lbl <- "**unknown**"
     download.date <- NA
   } else {
     dataset <- unique(ucdp.df$dataset)
     dataset.lbl <- dataset.lbls[dataset]
     version <- unique(ucdp.df$version)
-    download.date <- unique(ucdp.df$download.date)
+    download.date <- unique(ucdp.df$download_date)
   }
 
   ## Process dates and coverage
