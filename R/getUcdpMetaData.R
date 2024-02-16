@@ -24,7 +24,7 @@ getUcdpMetaData <- function(ucdp.df, as.text = FALSE) {
                              "One-sided violence", "Georeferenced event"), dataset.names)
 
   ## Validate required columns and extract information
-  required.cols <- c("dataset", "version", "download_date")
+  required.cols <- c("dataset", "version", "download.date")
   if (!all(required.cols %in% names(ucdp.df))) {
     warning("Metadata variables not found, outputting only known information.")
     dataset <- version <- "**unknown**"
@@ -33,7 +33,7 @@ getUcdpMetaData <- function(ucdp.df, as.text = FALSE) {
     dataset <- unique(ucdp.df$dataset)
     dataset.lbl <- dataset.lbls[dataset]
     version <- unique(ucdp.df$version)
-    download.date <- unique(ucdp.df$download_date)
+    download.date <- unique(ucdp.df$download.date)
   }
 
   ## Process dates and coverage
@@ -51,7 +51,7 @@ getUcdpMetaData <- function(ucdp.df, as.text = FALSE) {
 
   ## Format download date
   download.date.formatted <- if(!is.na(download.date)){
-    format(download_date, '%d %B %Y')
+    format(download.date, '%d %B %Y')
   } else {
     "**unknown date**"
   }
