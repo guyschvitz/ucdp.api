@@ -15,7 +15,7 @@ getFullUcdpGedData(
 \item{date}{A date object defining the reference date for retrieving the latest dataset
 versions. Defaults to the current system date.}
 
-\item{candidate.only}{Boolean: If set to TRUE, the call will only download the latest
+\item{candidate.only}{boolean. If set to TRUE, the call will only download the latest
 monthly and quarterly candidate datasets, and skip downloading the latest yearly
 release of final GED data, which can take a long time to complete. Default: FALSE}
 
@@ -27,8 +27,8 @@ A data.frame containing the latest full UCDP GED data (final + candidate
 or candidate only)
 }
 \description{
-Note: Final date of data coverage is always one month prior to the UCDP
-release date.
+getFullUcdpGedData: Wrapper function to download full UCDP GED data up to the
+latest release (default) or a user-specified release date.
 }
 \examples{
 # Get the latest UCDP GED data using the current system date

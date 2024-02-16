@@ -9,8 +9,8 @@ getUcdpMetaData(ucdp.df, as.text = FALSE)
 \arguments{
 \item{ucdp.df}{A data.frame containing UCDP data with expected metadata columns.}
 
-\item{as.text}{boolean: should result be returned as text (TRUE) or printed
-to the console (FALSE)? Default: False}
+\item{as.text}{boolean: Should result be returned as text (TRUE) or printed
+to the console (FALSE)? Default: FALSE}
 }
 \value{
 A text summary of the metadata or message printed to console
@@ -18,7 +18,7 @@ A text summary of the metadata or message printed to console
 \description{
 This function extracts metadata from a UCDP dataset downloaded through the
 API using the {ucdp.api} R package and prints the results as a text string
-or console message.
+or a console message.
 }
 \examples{
 ucdp.df <- read.csv("your_ucdp_data_file.csv")

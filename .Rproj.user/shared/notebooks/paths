@@ -6,6 +6,8 @@
 /home/schvigu/Documents/misc/ucdp_api/ucdp.api/R/checkUcdpAvailable.R="BF822644"
 /home/schvigu/Documents/misc/ucdp_api/ucdp.api/R/getFullUcdpGedData.R="774B06BA"
 /home/schvigu/Documents/misc/ucdp_api/ucdp.api/R/getLatestUcdpGedVersionIds.R="E5108AEE"
+/home/schvigu/Documents/misc/ucdp_api/ucdp.api/R/getUcdpData.R="12A492E8"
 /home/schvigu/Documents/misc/ucdp_api/ucdp.api/R/getUcdpFileInfo.R="420ADA49"
+/home/schvigu/Documents/misc/ucdp_api/ucdp.api/R/getUcdpMetaData.R="CAC171AB"
 /home/schvigu/Documents/misc/ucdp_api/ucdp.api/R/pingUrl.R="63812EF2"
 /home/schvigu/Documents/misc/ucdp_api/ucdp.api/README.md="0626A21A"

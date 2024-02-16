@@ -17,7 +17,8 @@ A data.frame listing the latest available versions of the UCDP GED dataset.
 This function queries the UCDP GED API to retrieve version IDs of the latest
 available UCDP GED datasets. It fetches the version IDs required to download
 the full UCDP GED data (final and candidate), covering January 1989 until the
-month prior to the latest update.
+month prior to the latest available update, or up until a user-defined reference
+date.
 }
 \examples{
 # Get the latest UCDP GED version IDs using the current system date

@@ -5,12 +5,10 @@
 #' or "gedevents" (daily data, released in monthly batches)
 #' The API does not require an account/key but there are some usage limitations
 #' For more information, see: https://ucdp.uu.se/apidocs/
-#'
 #' @param version character. Dataset version number.
 #' For yearly UCDP data: Format: YY.1 (e.g. 22.1 for data released in 2022)
 #' For monthly UCDP GED data use format: YY.0.MM (e.g. 22.0.11 for data on November 2022)
 #' For quarterly UCDP releases data use format: YY.01.YY.MM (e.g. 22.01.22.09 for data from Jan to Sep 2022)
-#'
 #' @param pagesize numeric. Page size of each individual query. Default: 100. Max: 1000
 #' The UCDP API divides dataset into N pages of size S,
 #' the query loops over all pages until full dataset is retrieved.

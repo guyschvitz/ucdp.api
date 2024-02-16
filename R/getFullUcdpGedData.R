@@ -3,11 +3,9 @@
 #'
 #' @param date A date object defining the reference date for retrieving the latest dataset
 #' versions. Defaults to the current system date.
-#'
 #' @param candidate.only boolean. If set to TRUE, the call will only download the latest
 #' monthly and quarterly candidate datasets, and skip downloading the latest yearly
 #' release of final GED data, which can take a long time to complete. Default: FALSE
-#'
 #' @param add.metadata boolean: Add metadata variables to output dataset (TRUE)
 #' or not (FALSE)? Includes dataset name, version number, download date. Default: TRUE
 #'
