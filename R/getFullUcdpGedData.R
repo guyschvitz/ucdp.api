@@ -2,14 +2,14 @@
 #' latest release (default) or a user-specified release date.
 #'
 #' @param date A date object defining the reference date for retrieving the latest dataset
-#' versions. Defaults to the current system date.
+#' versions. Defaults to the current system date-
 #' @param candidate.only boolean. If set to TRUE, the call will only download the latest
 #' monthly and quarterly candidate datasets, and skip downloading the latest yearly
 #' release of final GED data, which can take a long time to complete. Default: FALSE
 #' @param add.metadata boolean: Add metadata variables to output dataset (TRUE)
 #' or not (FALSE)? Includes dataset name, version number, download date. Default: TRUE
 #'
-#' @return A data.frame containing the latest full UCDP GED data (final + candidate
+#' @return A data.frame containing the latest full UCDP GED data (final & candidate
 #' or candidate only)
 #' @export
 #'
@@ -37,7 +37,7 @@ getFullUcdpGedData <- function(date = Sys.Date(), candidate.only = FALSE,
     if(add.metadata == TRUE){
     query.df$dataset <- "gedevents"
     query.df$version <- ged.version.df$version[x]
-    query.df$type <- ged.version.df$type
+    query.df$type <- ged.version.df$type[x]
     query.df$update <- ged.version.df$update[x]
     query.df$download_date <- Sys.Date()
     }
