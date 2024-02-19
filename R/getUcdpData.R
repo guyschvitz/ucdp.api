@@ -111,7 +111,6 @@ getUcdpData <- function(dataset, version, pagesize = 1000, max.retries = 10, add
     output.df$version <- version
     output.df$download_date <- Sys.Date()
   }
-  message("Done."))
-
+  message("Done.")
 return(output.df)
 }
