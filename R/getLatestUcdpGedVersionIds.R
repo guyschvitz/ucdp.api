@@ -86,28 +86,25 @@ getLatestUcdpGedVersionIds <- function(date = Sys.Date()){
   ## ... Add dataset name label
   version.df$dataset <- "gedevents"
 
-  ## ... Keep only required yearly update
+  ## ... Keep only latest yearly update
   keep.yr.df <- subset(version.df, update == "yearly")
   keep.yr.df <- subset(keep.yr.df, yr == max(yr))
 
-  ## Keep only required quarterly update:
+  ## Keep only required quarterly update (i.e. after latest yearly update)
   keep.q.df <- subset(version.df, update == "quarterly")
   keep.q.df <- subset(keep.q.df, yr == max(yr))
   keep.q.df <- subset(keep.q.df, mon == max(mon))
+  keep.q.df <- subset(keep.q.df, yr >= keep.yr.df$yr)
 
-  ## Keep only required monthly update:
+
+  ## Keep only latest monthly update (after latest yearly and quarterly updates)
   keep.m.df <- subset(version.df, update == "monthly")
+  keep.m.df <- subset(keep.m.df, yr >= keep.yr.df$yr)
 
-  if(max(keep.m.df$yr) > keep.q.df$yr){
-    ## Case 1: Monthly update is from year after latest
-    ## Quarterly update
-    keep.m.df <- subset(keep.m.df, yr > keep.q.df$yr)
-  } else {
-    ## Case 2: Monthly update is from month after latest
-    ## Quarterly update in the same year
-    keep.m.df <- subset(keep.m.df, yr == keep.q.df$yr)
+  ## If there is a quarterly update, keep only subsequent monthly updates
+  ## Example: Quarterly update covers Jan-Mar, keep only Apr, May, etc
+  if(nrow(keep.q.df) > 0){
     keep.m.df <- subset(keep.m.df, mon > keep.q.df$mon)
-
   }
 
   ## Compile final UCDP GED version ids
