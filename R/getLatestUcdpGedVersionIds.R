@@ -104,7 +104,7 @@ getLatestUcdpGedVersionIds <- function(date = Sys.Date()){
   ## If there is a quarterly update, keep only subsequent monthly updates
   ## Example: Quarterly update covers Jan-Mar, keep only Apr, May, etc
   if(nrow(keep.q.df) > 0){
-    keep.m.df <- subset(keep.m.df, mon > keep.q.df$mon)
+    keep.m.df <- subset(keep.m.df, ref_date > keep.q.df$ref_date)
   }
 
   ## Compile final UCDP GED version ids
