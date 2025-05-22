@@ -1,115 +1,108 @@
 #' getLatestUcdpGedVersionIds: Get version IDs of latest available UCDP GED datasets.
 #'
-#' This function queries the UCDP GED API to retrieve version IDs of the latest
-#' available UCDP GED datasets. It fetches the version IDs required to download
-#' the full UCDP GED data (final and candidate), covering January 1989 until the
-#' month prior to the latest available update, or up until a user-defined reference
-#' date.
+#' This function retrieves version IDs of the latest available UCDP GED datasets.
+#' It fetches the version IDs required to download the full UCDP GED data (final and candidate),
+#' covering January 1989 until the latest available update, or up until a
+#' user-defined reference date.
 #'
-#' @param date A date object defining the reference date for finding the latest dataset
-#' versions. Defaults to the current system date.
-#'
-#' @return A data.frame listing the latest available versions of the UCDP GED dataset.
+#' @param date Date object defining the reference point for available updates.
+#' Defaults to the system date.
+#' @return A data.frame with the latest available dataset versions.
 #' @export
-#'
-#' @importFrom stringr str_extract
-#' @importFrom lubridate floor_date
-#'
-#' @examples
-#' # Get the latest UCDP GED version IDs using the current system date
-#' getLatestUcdpGedVersionIds()
-#'
-#' # Get the latest UCDP GED version IDs using a specific date
-#' getLatestUcdpGedVersionIds(as.Date("2022-12-31"))
-getLatestUcdpGedVersionIds <- function(date = Sys.Date()){
+getLatestUcdpGedVersionIds <- function(date = Sys.Date()) {
 
-  ## Define yearly UCDP GED data version numbers:
-  ## Yearly updates cover 1989 until (excluding) year of the update
-  ## Example: UCDP GED 23.1 covers Jan 1989 to Dec 2022
-  ## ... Extract year from current date
+  ## Extract year and month from date
   date <- as.Date(date)
   yr <- as.numeric(format(date, "%y"))
   mon <- as.numeric(format(date, "%m"))
+  yrs <- c(yr, yr - 1)
 
-  ## ... Also include previous yearly data in case current year version has
-  ## ... Not been released yet (released around June/July)
-  prev.yr <- yr - 1
-  yrs <- c(yr, prev.yr)
-
-  ## ... Construct yearly version numbers
-  yr.versions <- sprintf("%s.1", yrs)
-  names(yr.versions) <- rep("yearly", length(yr.versions))
-
-  ## Define monthly version numbers.
-  m.versions <- unlist(lapply(yrs, function(x){sprintf("%s.0.%s", x, 1:12)}))
-  names(m.versions) <- rep("monthly", length(m.versions))
-
-  ## Define quarterly version numbers
-  ## NOTE: Normally the quarterly releases would end with months 3, 6, 9 and 12,
-  ## But UCDP's quarterly release schedule is not 100% consistent so we have to
-  ## consider all months
-  q.versions <- unlist(lapply(yrs, function(x){sprintf("%s.01.%s.%s", x, x,
-                                                       ## ... Add leading zero
-                                                       sprintf("%02d", 1:12))}))
-  names(q.versions) <- rep("quarterly", length(q.versions))
-
-  ## Combine all version names into single vector and data.frame
-  version.vec <- c(yr.versions, q.versions, m.versions)
-  version.df <- data.frame(update = names(version.vec),
-                           version = unname(version.vec))
-
-  ## Code additional variables
-  ## ... Year label
-  version.df$yr <- as.numeric(substr(version.df$version, 1,2))
-
-  ## ... Month label
-  version.df$mon <- as.numeric(stringr::str_extract(version.df$version, "[0-9]{1,}$"))
-
-  ## ... Add reference date label
-  version.df$ref_date <- as.Date(sprintf("20%s-%s-1", version.df$yr, version.df$mon))
-
-  ## Keep only dataset versions up to user-specified end-date
-  version.df <- version.df[version.df$ref_date < lubridate::floor_date(date, "months"),]
-
-  ## Check which datasets exist and keep only those dataset names
-  version.df$exists <- sapply(1:nrow(version.df), function(x) {
-    checkUcdpAvailable(dataset = "gedevents", version = version.df$version[x],
-                                 as.vector = TRUE)
-  })
-
-  ## ... Keep only existing datasets
-  version.df <- version.df[version.df$exists == TRUE,]
-
-  ## ... Add "final" vs "candidate" label
-  version.df$type <- ifelse(grepl("yearly", version.df$update), "final", "candidate")
-
-  ## ... Add dataset name label
-  version.df$dataset <- "gedevents"
-
-  ## ... Keep only latest yearly update
-  keep.yr.df <- subset(version.df, update == "yearly")
-  keep.yr.df <- subset(keep.yr.df, yr == max(yr))
-
-  ## Keep only required quarterly update (i.e. after latest yearly update)
-  keep.q.df <- subset(version.df, update == "quarterly")
-  keep.q.df <- subset(keep.q.df, yr == max(yr))
-  keep.q.df <- subset(keep.q.df, mon == max(mon))
-  keep.q.df <- subset(keep.q.df, yr >= keep.yr.df$yr)
-
-
-  ## Keep only latest monthly update (after latest yearly and quarterly updates)
-  keep.m.df <- subset(version.df, update == "monthly")
-  keep.m.df <- subset(keep.m.df, yr >= keep.yr.df$yr)
-
-  ## If there is a quarterly update, keep only subsequent monthly updates
-  ## Example: Quarterly update covers Jan-Mar, keep only Apr, May, etc
-  if(nrow(keep.q.df) > 0){
-    keep.m.df <- subset(keep.m.df, ref_date > keep.q.df$ref_date)
+  ## Function to create GED version names according to UCDP naming convention
+  getVersionNames <- function(yrs, type) {
+    if (type == "yearly") {
+      ## ... Yearly dataset versions
+      v.name <- setNames(sprintf("%s.1", yrs), rep("yearly", length(yrs)))
+    } else if (type == "monthly") {
+      ## ... Monthly dataset versions
+      out <- character()
+      for (y in yrs) {
+        out <- c(out, sprintf("%s.0.%s", y, 1:12))
+      }
+      v.name <- setNames(out, rep("monthly", length(out)))
+    } else if (type == "quarterly") {
+      ## ... Quarterly dataset versions
+      out <- character()
+      for (y in yrs) {
+        out <- c(out, sprintf("%s.01.%s.%s", y, y, sprintf("%02d", 1:12)))
+      }
+      v.name <- setNames(out, rep("quarterly", length(out)))
+    } else {
+      stop("Unsupported version type.")
+    }
+    return(v.name)
   }
 
-  ## Compile final UCDP GED version ids
-  version.df <- unique(rbind(keep.yr.df, keep.q.df, keep.m.df))
-  version.df <- version.df[,c("dataset", "type", "update", "version", "exists")]
+  ## Get vector of all possible yearly, monthly, quarterly version names for the
+  ## current and previous year (defined by 'date')
+  version.vec <- c(
+    getVersionNames(yrs, "yearly"),
+    getVersionNames(yrs, "quarterly"),
+    getVersionNames(yrs, "monthly")
+  )
 
-  return(version.df)
+  ## Compile in data.frame
+  version.df <- data.frame(
+    update = names(version.vec),
+    version = unname(version.vec),
+    stringsAsFactors = FALSE
+  )
+
+  ## Add dataset year, month, and reference date
+  version.df$yr <- as.numeric(substr(version.df$version, 1, 2))
+  version.df$mon <- as.numeric(sub(".*\\.", "", version.df$version))
+  version.df$ref_date <- as.Date(sprintf("20%02d-%02d-01", version.df$yr, version.df$mon))
+
+  ## Exclude future datasets: only keep datasets with ref_date before the first day of the current month
+  version.df <- version.df[version.df$ref_date < as.Date(format(date, "%Y-%m-01")), ]
+
+  ## For remaining datasets, ping API to see if they exist
+  version.check.df <- do.call(rbind, lapply(version.df$version, function(v) {
+    return(checkUcdpAvailable("gedevents", v, as.vector = FALSE))
+  }))
+
+  ## If all requests fail, return error message
+  if (all(!version.check.df$exists)) {
+    msg <- sprintf(
+      "Request failed with status codes: %s",
+      paste(sort(unique(version.check.df$status)), collapse = ", ")
+    )
+    stop(msg)
+  }
+
+  ## Merge original version data.frame with results, keep only datasets that exist
+  keep.version.df <- merge(version.df, version.check.df, by = "version")
+  keep.version.df <- keep.version.df[keep.version.df$exists == TRUE, ]
+  keep.version.df$type <- ifelse(keep.version.df$update == "yearly", "final", "candidate")
+  keep.version.df$dataset <- "gedevents"
+
+  ## Ensure that only the latest yearly, quarterly and monthly datasets are kept
+  ## to avoid overlaps / duplicate data
+  keep.yr.df <- keep.version.df[keep.version.df$update == "yearly" &
+                                  keep.version.df$yr == max(keep.version.df$yr), ]
+
+  keep.q.df <- keep.version.df[keep.version.df$update == "quarterly" &
+                                 keep.version.df$yr == max(keep.version.df$yr), ]
+  if (nrow(keep.q.df) > 0) {
+    keep.q.df <- keep.q.df[keep.q.df$mon == max(keep.q.df$mon), ]
+  }
+
+  keep.m.df <- keep.version.df[keep.version.df$update == "monthly" &
+                                 keep.version.df$yr >= max(keep.version.df$yr), ]
+  if (nrow(keep.q.df) > 0) {
+    keep.m.df <- keep.m.df[keep.m.df$ref_date > max(keep.q.df$ref_date), ]
+  }
+
+  ## Return final output dataset
+  version.out.df <- unique(rbind(keep.yr.df, keep.q.df, keep.m.df))
+  return(version.out.df)
 }

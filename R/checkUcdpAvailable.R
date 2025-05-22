@@ -43,7 +43,7 @@ checkUcdpAvailable <- function(dataset, version, as.vector = FALSE){
   }
 
   ## Build initial URL: Insert dataset and version number
-  url <- sprintf("https://ucdpapi.pcr.uu.se/api/%s/%s?pagesize=100",
+  url <- sprintf("https://ucdpapi.pcr.uu.se/api/%s/%s?pagesize=1",
                  dataset, version)
 
   ## ping URL
@@ -64,6 +64,7 @@ checkUcdpAvailable <- function(dataset, version, as.vector = FALSE){
   } else {
     out.df <- data.frame("dataset" = dataset,
                          "version" = version,
+                         "status" = url.ping$status_code,
                          "exists" = exists)
     return(out.df)
   }
