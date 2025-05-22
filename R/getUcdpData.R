@@ -1,4 +1,4 @@
-#' getUcdpData: Download data from the Uppsala Conflict Database Program API.
+#' Download data from the Uppsala Conflict Database Program API.
 #'
 #' @param dataset character. Name of UCDP dataset. Needs to be one of the following:
 #' "ucdpprioconflict", "battledeaths", "dyadic", "nonstate", "onesided" (yearly data),
@@ -23,10 +23,11 @@
 #'
 #' @importFrom httr GET content
 #' @importFrom dplyr bind_rows mutate_if
+#' @importFrom stats ave setNames
+#' @importFrom utils txtProgressBar setTxtProgressBar
 #'
 #' @examples
-#' getUcdpData(dataset = ucdpprioconflict, version = "22.1", pagesize = 1000)
-#' getUcdpData(dataset = gedevents, version = "22.1", pagesize = 1000)
+#' getUcdpData(dataset = ucdpprioconflict, version = "22.1", pagesize = 100)
 getUcdpData <- function(dataset, version, pagesize = 1000, max.retries = 10, add.metadata = TRUE) {
   if(pagesize > 1000) {
     stop("Page size cannot exceed 1000")

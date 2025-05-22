@@ -18,17 +18,10 @@
 #'
 #' @examples
 #' ## Check which monthly UCDP GED candidate datasets are available
-#' ## m.ids <- 1:12
+#' m.ids <- 1:12
 #' gedc.m.check.df <- do.call(rbind, lapply(m.ids, function(x){
 #'   checkUcdpAvailable("gedevents", sprintf("22.0.%s", x))
 #'   }))
-#'
-#' ## Check which quarterly UCDP GED candidate datasets are available
-#' q.ids <- sprintf("%02d", seq(3, 12, 3))
-#' gedc.q.check.df <- do.call(rbind, lapply(q.ids, function(x){
-#'   checkUcdpAvailable("gedevents", sprintf("22.01.22.%s", x))
-#'   }))
-#'
 checkUcdpAvailable <- function(dataset, version, as.vector = FALSE){
 
   ## Check if dataset name is valid

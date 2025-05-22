@@ -2,7 +2,7 @@
 % Please edit documentation in R/getUcdpData.R
 \name{getUcdpData}
 \alias{getUcdpData}
-\title{getUcdpData: Download data from the Uppsala Conflict Database Program API.}
+\title{Download data from the Uppsala Conflict Database Program API.}
 \usage{
 getUcdpData(
   dataset,
@@ -39,9 +39,8 @@ Default: TRUE}
 data.frame with requested UCDP dataset
 }
 \description{
-getUcdpData: Download data from the Uppsala Conflict Database Program API.
+Download data from the Uppsala Conflict Database Program API.
 }
 \examples{
-getUcdpData(dataset = ucdpprioconflict, version = "22.1", pagesize = 1000)
-getUcdpData(dataset = gedevents, version = "22.1", pagesize = 1000)
+getUcdpData(dataset = ucdpprioconflict, version = "22.1", pagesize = 100)
 }

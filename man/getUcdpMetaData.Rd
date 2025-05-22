@@ -2,7 +2,7 @@
 % Please edit documentation in R/getUcdpMetaData.R
 \name{getUcdpMetaData}
 \alias{getUcdpMetaData}
-\title{getUcdpMetaData: Get metadata from UCDP Dataset downloaded through {ucdp.api}}
+\title{Get metadata from UCDP Dataset downloaded through \pkg{ucdp.api}}
 \usage{
 getUcdpMetaData(ucdp.df, as.text = FALSE)
 }
@@ -17,7 +17,7 @@ A text summary of the metadata or message printed to console.
 }
 \description{
 This function extracts metadata from a UCDP dataset downloaded through the
-API using the {ucdp.api} R package and prints the results as a text string
+API using the \pkg{ucdp.api} R package and prints the results as a text string
 or console message.
 }
 \examples{

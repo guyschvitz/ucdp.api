@@ -1,7 +1,7 @@
-#' getUcdpMetaData: Get metadata from UCDP Dataset downloaded through {ucdp.api}
+#' Get metadata from UCDP Dataset downloaded through \pkg{ucdp.api}
 #'
 #' This function extracts metadata from a UCDP dataset downloaded through the
-#' API using the {ucdp.api} R package and prints the results as a text string
+#' API using the \pkg{ucdp.api} R package and prints the results as a text string
 #' or console message.
 #'
 #' @param ucdp.df A data.frame containing UCDP data with expected metadata columns.

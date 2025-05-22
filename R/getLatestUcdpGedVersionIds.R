@@ -1,4 +1,4 @@
-#' getLatestUcdpGedVersionIds: Get version IDs of latest available UCDP GED datasets.
+#' Get version IDs of latest available UCDP GED datasets.
 #'
 #' This function retrieves version IDs of the latest available UCDP GED datasets.
 #' It fetches the version IDs required to download the full UCDP GED data (final and candidate),
@@ -19,19 +19,16 @@ getLatestUcdpGedVersionIds <- function(date = Sys.Date()) {
 
   ## Function to create GED version names according to UCDP naming convention
   getVersionNames <- function(yrs, type) {
+    out <- character()
     if (type == "yearly") {
-      ## ... Yearly dataset versions
-      v.name <- setNames(sprintf("%s.1", yrs), rep("yearly", length(yrs)))
+      out <- sprintf("%s.1", yrs)
+      v.name <- setNames(out, rep("yearly", length(out)))
     } else if (type == "monthly") {
-      ## ... Monthly dataset versions
-      out <- character()
       for (y in yrs) {
         out <- c(out, sprintf("%s.0.%s", y, 1:12))
       }
       v.name <- setNames(out, rep("monthly", length(out)))
     } else if (type == "quarterly") {
-      ## ... Quarterly dataset versions
-      out <- character()
       for (y in yrs) {
         out <- c(out, sprintf("%s.01.%s.%s", y, y, sprintf("%02d", 1:12)))
       }
@@ -42,8 +39,7 @@ getLatestUcdpGedVersionIds <- function(date = Sys.Date()) {
     return(v.name)
   }
 
-  ## Get vector of all possible yearly, monthly, quarterly version names for the
-  ## current and previous year (defined by 'date')
+  ## Get vector of all possible yearly, monthly, quarterly version names for current and previous year
   version.vec <- c(
     getVersionNames(yrs, "yearly"),
     getVersionNames(yrs, "quarterly"),
@@ -70,7 +66,7 @@ getLatestUcdpGedVersionIds <- function(date = Sys.Date()) {
     return(checkUcdpAvailable("gedevents", v, as.vector = FALSE))
   }))
 
-  ## If all requests fail, return error message
+  ## If no datasets are available, return informative error
   if (all(!version.check.df$exists)) {
     msg <- sprintf(
       "Request failed with status codes: %s",
@@ -79,14 +75,13 @@ getLatestUcdpGedVersionIds <- function(date = Sys.Date()) {
     stop(msg)
   }
 
-  ## Merge original version data.frame with results, keep only datasets that exist
+  ## Merge original version list with availability results
   keep.version.df <- merge(version.df, version.check.df, by = "version")
   keep.version.df <- keep.version.df[keep.version.df$exists == TRUE, ]
   keep.version.df$type <- ifelse(keep.version.df$update == "yearly", "final", "candidate")
   keep.version.df$dataset <- "gedevents"
 
-  ## Ensure that only the latest yearly, quarterly and monthly datasets are kept
-  ## to avoid overlaps / duplicate data
+  ## Retain only the latest yearly, quarterly, and monthly versions
   keep.yr.df <- keep.version.df[keep.version.df$update == "yearly" &
                                   keep.version.df$yr == max(keep.version.df$yr), ]
 
@@ -102,7 +97,7 @@ getLatestUcdpGedVersionIds <- function(date = Sys.Date()) {
     keep.m.df <- keep.m.df[keep.m.df$ref_date > max(keep.q.df$ref_date), ]
   }
 
-  ## Return final output dataset
+  ## Return final result
   version.out.df <- unique(rbind(keep.yr.df, keep.q.df, keep.m.df))
   return(version.out.df)
 }
