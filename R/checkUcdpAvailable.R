@@ -48,7 +48,9 @@ checkUcdpAvailable <- function(dataset, version, as.vector = FALSE){
   if(any(class(url.ping) == "error") | url.ping$status_code %in% 400:504) {
     exists <- F
   } else {
-    exists <- T
+    ## Check if dataset has data (TotalPages > 0)
+    content <- httr::content(url.ping, encoding = "UTF-8")
+    exists <- content$TotalPages > 0
   }
 
   ## Collect name of data, version and result of ping

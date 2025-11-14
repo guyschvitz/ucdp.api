@@ -71,6 +71,12 @@ getUcdpData <- function(dataset, version, pagesize = 1000, max.retries = 10, add
   query.ls <- safeGET(url, max.retries)
   n.pages <- query.ls$TotalPages
 
+  ## Check if dataset has any data
+  if(n.pages == 0) {
+    stop(sprintf("Dataset '%s' version %s exists but contains no data (0 pages). This may indicate the dataset is not yet available or is empty.",
+                 dataset, version))
+  }
+
   message(sprintf("Getting UCDP '%s' dataset, Version %s...", dataset, version))
 
   ## Create list to store output data in
@@ -113,5 +119,5 @@ getUcdpData <- function(dataset, version, pagesize = 1000, max.retries = 10, add
     output.df$download_date <- Sys.Date()
   }
   message("Done.")
-return(output.df)
+  return(output.df)
 }
