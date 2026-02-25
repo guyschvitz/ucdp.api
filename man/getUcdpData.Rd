@@ -7,6 +7,7 @@
 getUcdpData(
   dataset,
   version,
+  token,
   pagesize = 1000,
   max.retries = 10,
   add.metadata = TRUE
@@ -23,6 +24,9 @@ For more information, see: https://ucdp.uu.se/apidocs/}
 For yearly UCDP data: Format: YY.1 (e.g. 22.1 for data released in 2022)
 For monthly UCDP GED data use format: YY.0.MM (e.g. 22.0.11 for data on November 2022)
 For quarterly UCDP releases data use format: YY.01.YY.MM (e.g. 22.01.22.09 for data from Jan to Sep 2022)}
+
+\item{token}{character. UCDP API access token. Required for authentication.
+Obtain a token from the UCDP API portal: https://ucdp.uu.se/apidocs/}
 
 \item{pagesize}{numeric. Page size of each individual query. Default: 1000. Max: 1000
 The UCDP API divides dataset into N pages of size S,
@@ -42,5 +46,12 @@ data.frame with requested UCDP dataset
 Download data from the Uppsala Conflict Database Program API.
 }
 \examples{
-getUcdpData(dataset = ucdpprioconflict, version = "22.1", pagesize = 100)
+\dontrun{
+getUcdpData(
+  dataset = "ucdpprioconflict",
+  version = "22.1",
+  token = Sys.getenv("UCDP_TOKEN"),
+  pagesize = 100
+)
+}
 }

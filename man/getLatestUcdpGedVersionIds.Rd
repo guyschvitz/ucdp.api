@@ -4,11 +4,14 @@
 \alias{getLatestUcdpGedVersionIds}
 \title{Get version IDs of latest available UCDP GED datasets.}
 \usage{
-getLatestUcdpGedVersionIds(date = Sys.Date())
+getLatestUcdpGedVersionIds(date = Sys.Date(), token)
 }
 \arguments{
 \item{date}{Date object defining the reference point for available updates.
 Defaults to the system date.}
+
+\item{token}{character. UCDP API access token. Required for authentication.
+Obtain a token from the UCDP API portal: https://ucdp.uu.se/apidocs/}
 }
 \value{
 A data.frame with the latest available dataset versions.
@@ -18,4 +21,12 @@ This function retrieves version IDs of the latest available UCDP GED datasets.
 It fetches the version IDs required to download the full UCDP GED data (final and candidate),
 covering January 1989 until the latest available update, or up until a
 user-defined reference date.
+}
+\examples{
+\dontrun{
+getLatestUcdpGedVersionIds(
+  date = as.Date("2024-06-15"),
+  token = Sys.getenv("UCDP_TOKEN")
+)
+}
 }

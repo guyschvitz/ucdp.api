@@ -4,13 +4,12 @@
 \alias{checkUcdpAvailable}
 \title{checkUcdpAvailable: Check which UCDP datasets are currently available through the API.}
 \usage{
-checkUcdpAvailable(dataset, version, as.vector = FALSE)
+checkUcdpAvailable(dataset, version, token, as.vector = FALSE)
 }
 \arguments{
 \item{dataset}{character. Name of UCDP dataset. Needs to be one of the following:
 "ucdpprioconflict", "battledeaths", "dyadic", "nonstate", "onesided" (yearly data),
 or "gedevents" (daily data, released in monthly batches)
-The API does not require an account/key but there are some usage limitations
 For more information, see: https://ucdp.uu.se/apidocs/}
 
 \item{version}{character. Dataset version number.
@@ -19,19 +18,29 @@ For monthly UCDP GED data use format: YY.0.MM (e.g. 22.0.11 for data on November
 For quarterly UCDP releases data use format: YY.01.YY.MM
 (e.g. 22.01.22.09 for data from Jan to Sep 2022)}
 
+\item{token}{character. UCDP API access token. Required for authentication.
+Obtain a token from the UCDP API portal: https://ucdp.uu.se/apidocs/}
+
 \item{as.vector}{boolean: Return output as multi-column data.frame (FALSE) or
 as simple vector (TRUE)? Default: FALSE}
 }
 \value{
-data.frame with requested UCDP dataset
+data.frame with dataset name, version, HTTP status, and availability flag,
+or a logical scalar if as.vector = TRUE
 }
 \description{
 checkUcdpAvailable: Check which UCDP datasets are currently available through the API.
 }
 \examples{
+\dontrun{
 ## Check which monthly UCDP GED candidate datasets are available
 m.ids <- 1:12
-gedc.m.check.df <- do.call(rbind, lapply(m.ids, function(x){
-  checkUcdpAvailable("gedevents", sprintf("22.0.\%s", x))
-  }))
+gedc.m.check.df <- do.call(rbind, lapply(m.ids, function(x) {
+  checkUcdpAvailable(
+    dataset = "gedevents",
+    version = sprintf("22.0.\%s", x),
+    token = Sys.getenv("UCDP_TOKEN")
+  )
+}))
+}
 }

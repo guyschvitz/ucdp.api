@@ -7,9 +7,24 @@
 #'
 #' @param date Date object defining the reference point for available updates.
 #' Defaults to the system date.
+#' @param token character. UCDP API access token. Required for authentication.
+#' Obtain a token from the UCDP API portal: https://ucdp.uu.se/apidocs/
 #' @return A data.frame with the latest available dataset versions.
 #' @export
-getLatestUcdpGedVersionIds <- function(date = Sys.Date()) {
+#'
+#' @examples
+#' \dontrun{
+#' getLatestUcdpGedVersionIds(
+#'   date = as.Date("2024-06-15"),
+#'   token = Sys.getenv("UCDP_TOKEN")
+#' )
+#' }
+getLatestUcdpGedVersionIds <- function(date = Sys.Date(), token) {
+
+  ## Validate token
+  if (missing(token) || !is.character(token) || nchar(token) == 0) {
+    stop("A valid API access token is required. Obtain one at https://ucdp.uu.se/apidocs/")
+  }
 
   ## Extract year and month from date
   date <- as.Date(date)
@@ -39,11 +54,11 @@ getLatestUcdpGedVersionIds <- function(date = Sys.Date()) {
     return(v.name)
   }
 
-  ## Get vector of all possible yearly, monthly, quarterly version names for current and previous year
+  ## Get vector of all possible yearly, monthly, quarterly version names
   version.vec <- c(
-    getVersionNames(yrs, "yearly"),
-    getVersionNames(yrs, "quarterly"),
-    getVersionNames(yrs, "monthly")
+    getVersionNames(yrs = yrs, type = "yearly"),
+    getVersionNames(yrs = yrs, type = "quarterly"),
+    getVersionNames(yrs = yrs, type = "monthly")
   )
 
   ## Compile in data.frame
@@ -63,16 +78,20 @@ getLatestUcdpGedVersionIds <- function(date = Sys.Date()) {
 
   ## For remaining datasets, ping API to see if they exist
   version.check.df <- do.call(rbind, lapply(version.df$version, function(v) {
-    return(checkUcdpAvailable("gedevents", v, as.vector = FALSE))
+    checkUcdpAvailable(
+      dataset = "gedevents",
+      version = v,
+      token = token,
+      as.vector = FALSE
+    )
   }))
 
   ## If no datasets are available, return informative error
   if (all(!version.check.df$exists)) {
-    msg <- sprintf(
-      "Request failed with status codes: %s",
+    stop(sprintf(
+      "No UCDP GED datasets found. Request failed with status codes: %s",
       paste(sort(unique(version.check.df$status)), collapse = ", ")
-    )
-    stop(msg)
+    ))
   }
 
   ## Merge original version list with availability results

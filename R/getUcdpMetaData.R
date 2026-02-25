@@ -11,17 +11,31 @@
 #' @return A text summary of the metadata or message printed to console.
 #' @export
 #'
+#' @importFrom glue glue
+#'
 #' @examples
-#' ucdp.df <- read.csv("your_ucdp_data_file.csv")
-#' getUcdpMetaData(ucdp.df, as.text = TRUE)
+#' \dontrun{
+#' sbc.df <- getUcdpData(
+#'   dataset = "ucdpprioconflict",
+#'   version = "23.1",
+#'   token = Sys.getenv("UCDP_TOKEN"),
+#'   add.metadata = TRUE
+#' )
+#' getUcdpMetaData(ucdp.df = sbc.df, as.text = FALSE)
+#' }
 getUcdpMetaData <- function(ucdp.df, as.text = FALSE) {
 
   ## Define dataset names and labels
-  dataset.names <- c("ucdpprioconflict", "battledeaths", "dyadic", "nonstate",
-                     "onesided", "gedevents")
-  dataset.lbls <- setNames(c("State-based conflict", "State based conflict, battle-related deaths",
-                             "State based conflict, dyadic", "Non-state conflict",
-                             "One-sided violence", "Georeferenced event"), dataset.names)
+  dataset.names <- c(
+    "ucdpprioconflict", "battledeaths", "dyadic",
+    "nonstate", "onesided", "gedevents"
+  )
+  dataset.lbls <- setNames(
+    c("State-based conflict", "State based conflict, battle-related deaths",
+      "State based conflict, dyadic", "Non-state conflict",
+      "One-sided violence", "Georeferenced event"),
+    dataset.names
+  )
 
   ## Validate required columns and extract information
   required.cols <- c("dataset", "version", "download_date")
@@ -50,15 +64,17 @@ getUcdpMetaData <- function(ucdp.df, as.text = FALSE) {
   }
 
   ## Format download date
-  download.date.formatted <- if(!is.na(download.date)){
-    format(download.date, '%d %B %Y')
+  download.date.formatted <- if (!is.na(download.date)) {
+    format(download.date, "%d %B %Y")
   } else {
     "**unknown date**"
   }
 
   ## Construct message text
   txt <- glue::glue(
-    "UCDP {dataset.lbl} dataset, downloaded through the UCDP API on {download.date.formatted} using the ucdp.api R package:\nhttps://github.com/guyschvitz/ucdp.api \n\n",
+    "UCDP {dataset.lbl} dataset, downloaded through the UCDP API on ",
+    "{download.date.formatted} using the ucdp.api R package:\n",
+    "https://github.com/guyschvitz/ucdp.api \n\n",
     "Dataset version(s): {paste(version, collapse = ', ')} \n",
     "Data coverage: {start} to {end} \n",
     "For more information on the UCDP data and API, visit: https://ucdp.uu.se/apidocs/ \n",
@@ -73,6 +89,7 @@ getUcdpMetaData <- function(ucdp.df, as.text = FALSE) {
       ""
     }
   )
+
   if (as.text) {
     return(txt)
   } else {

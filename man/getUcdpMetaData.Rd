@@ -21,6 +21,13 @@ API using the \pkg{ucdp.api} R package and prints the results as a text string
 or console message.
 }
 \examples{
-ucdp.df <- read.csv("your_ucdp_data_file.csv")
-getUcdpMetaData(ucdp.df, as.text = TRUE)
+\dontrun{
+sbc.df <- getUcdpData(
+  dataset = "ucdpprioconflict",
+  version = "23.1",
+  token = Sys.getenv("UCDP_TOKEN"),
+  add.metadata = TRUE
+)
+getUcdpMetaData(ucdp.df = sbc.df, as.text = FALSE)
+}
 }

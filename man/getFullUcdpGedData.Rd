@@ -7,13 +7,17 @@ latest release (default) or a user-specified release date.}
 \usage{
 getFullUcdpGedData(
   date = Sys.Date(),
+  token,
   candidate.only = FALSE,
   add.metadata = TRUE
 )
 }
 \arguments{
 \item{date}{A date object defining the reference date for retrieving the latest dataset
-versions. Defaults to the current system date-}
+versions. Defaults to the current system date.}
+
+\item{token}{character. UCDP API access token. Required for authentication.
+Obtain a token from the UCDP API portal: https://ucdp.uu.se/apidocs/}
 
 \item{candidate.only}{boolean. If set to TRUE, the call will only download the latest
 monthly and quarterly candidate datasets, and skip downloading the latest yearly
@@ -31,9 +35,14 @@ getFullUcdpGedData: Wrapper function to download full UCDP GED data up to the
 latest release (default) or a user-specified release date.
 }
 \examples{
-# Get the latest UCDP GED data using the current system date
-getFullUcdpGedData()
+\dontrun{
+## Get the latest UCDP GED data using the current system date
+getFullUcdpGedData(token = Sys.getenv("UCDP_TOKEN"))
 
-# Get the latest UCDP GED data using a specific date
-getFullUcdpGedData(as.Date("2022-12-31"))
+## Get the latest UCDP GED data using a specific date
+getFullUcdpGedData(
+  date = as.Date("2022-12-31"),
+  token = Sys.getenv("UCDP_TOKEN")
+)
+}
 }
