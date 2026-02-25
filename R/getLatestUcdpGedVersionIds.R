@@ -77,35 +77,36 @@ getLatestUcdpGedVersionIds <- function(date = Sys.Date(), token) {
   version.df <- version.df[version.df$ref_date < as.Date(format(date, "%Y-%m-01")), ]
 
   ## For remaining datasets, ping API to see if they exist
-  version.check.df <- do.call(rbind, lapply(version.df$version, function(v) {
+  version.df$exists <- sapply(version.df$version, function(v) {
     checkUcdpAvailable(
       dataset = "gedevents",
       version = v,
       token = token,
-      as.vector = FALSE
+      as.vector = TRUE
     )
-  }))
+  })
 
   ## If no datasets are available, return informative error
-  if (all(!version.check.df$exists)) {
+  if (all(!version.df$exists)) {
     stop(sprintf(
       "No UCDP GED datasets found. Request failed with status codes: %s",
-      paste(sort(unique(version.check.df$status)), collapse = ", ")
+      paste(sort(unique(version.df$status)), collapse = ", ")
     ))
   }
 
-  ## Merge original version list with availability results
-  keep.version.df <- merge(version.df, version.check.df, by = "version")
-  keep.version.df <- keep.version.df[keep.version.df$exists == TRUE, ]
+  ## Retain only available datasets
+  keep.version.df <- version.df[version.df$exists == TRUE, ]
   keep.version.df$type <- ifelse(keep.version.df$update == "yearly", "final", "candidate")
   keep.version.df$dataset <- "gedevents"
 
   ## Retain only the latest yearly, quarterly, and monthly versions
+  max.yr <- max(keep.version.df$yr[keep.version.df$update == "yearly"])
   keep.yr.df <- keep.version.df[keep.version.df$update == "yearly" &
-                                  keep.version.df$yr == max(keep.version.df$yr), ]
+                                  keep.version.df$yr == max.yr, ]
 
+  max.qyr <-  max(keep.version.df$yr[keep.version.df$update == "quarterly"])
   keep.q.df <- keep.version.df[keep.version.df$update == "quarterly" &
-                                 keep.version.df$yr == max(keep.version.df$yr), ]
+                                 keep.version.df$yr == max.qyr, ]
   if (nrow(keep.q.df) > 0) {
     keep.q.df <- keep.q.df[keep.q.df$mon == max(keep.q.df$mon), ]
   }
