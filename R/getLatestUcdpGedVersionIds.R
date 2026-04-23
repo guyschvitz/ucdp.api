@@ -68,13 +68,45 @@ getLatestUcdpGedVersionIds <- function(date = Sys.Date(), token) {
     stringsAsFactors = FALSE
   )
 
-  ## Add dataset year, month, and reference date
-  version.df$yr <- as.numeric(substr(version.df$version, 1, 2))
-  version.df$mon <- as.numeric(sub(".*\\.", "", version.df$version))
-  version.df$ref_date <- as.Date(sprintf("20%02d-%02d-01", version.df$yr, version.df$mon))
+  ## Compute data coverage (data.sdate, data.edate) for each version.
+  ##
+  ## Coverage rules:
+  ##   Yearly   X.1       : 1989-01-01 to Dec 31 of year (2000+X-1)
+  ##                        e.g. 25.1 -> 1989-01-01 to 2024-12-31
+  ##   Monthly  X.0.M      : first to last day of month M in year (2000+X)
+  ##                        e.g. 25.0.1 -> 2025-01-01 to 2025-01-31
+  ##   Quarterly X.01.X.M  : Jan 1 to last day of month M in year (2000+X)
+  ##                        e.g. 25.01.25.09 -> 2025-01-01 to 2025-09-30
+  coverageDates <- function(update, version) {
+    yy <- as.numeric(substr(version, 1, 2))
+    if (update == "yearly") {
+      sdate <- as.Date("1989-01-01")
+      edate <- as.Date(sprintf("%04d-12-31", 2000 + yy - 1))
+    } else if (update == "monthly") {
+      mm <- as.numeric(sub(".*\\.", "", version))
+      sdate <- as.Date(sprintf("%04d-%02d-01", 2000 + yy, mm))
+      edate <- seq(sdate, by = "1 month", length.out = 2)[2] - 1
+    } else if (update == "quarterly") {
+      mm <- as.numeric(sub(".*\\.", "", version))
+      sdate <- as.Date(sprintf("%04d-01-01", 2000 + yy))
+      first.of.month <- as.Date(sprintf("%04d-%02d-01", 2000 + yy, mm))
+      edate <- seq(first.of.month, by = "1 month", length.out = 2)[2] - 1
+    } else {
+      stop("Unsupported version type.")
+    }
+    list(sdate = sdate, edate = edate)
+  }
 
-  ## Exclude future datasets: only keep datasets with ref_date before the first day of the current month
-  version.df <- version.df[version.df$ref_date < as.Date(format(date, "%Y-%m-01")), ]
+  cov.list <- mapply(coverageDates,
+                     version.df$update,
+                     version.df$version,
+                     SIMPLIFY = FALSE)
+  version.df$data.sdate <- as.Date(sapply(cov.list, function(x) as.character(x$sdate)))
+  version.df$data.edate <- as.Date(sapply(cov.list, function(x) as.character(x$edate)))
+
+  ## Exclude future datasets: drop any dataset whose coverage end is on or after
+  ## the first day of the reference date's month (i.e. not yet complete).
+  version.df <- version.df[version.df$data.edate < as.Date(format(date, "%Y-%m-01")), ]
 
   ## For remaining datasets, ping API to see if they exist
   version.df$exists <- sapply(version.df$version, function(v) {
@@ -99,25 +131,34 @@ getLatestUcdpGedVersionIds <- function(date = Sys.Date(), token) {
   keep.version.df$type <- ifelse(keep.version.df$update == "yearly", "final", "candidate")
   keep.version.df$dataset <- "gedevents"
 
-  ## Retain only the latest yearly, quarterly, and monthly versions
-  max.yr <- max(keep.version.df$yr[keep.version.df$update == "yearly"])
-  keep.yr.df <- keep.version.df[keep.version.df$update == "yearly" &
-                                  keep.version.df$yr == max.yr, ]
+  ## Yearly: keep the latest final release (the one with the latest data.edate)
+  yr.df <- keep.version.df[keep.version.df$update == "yearly", ]
+  keep.yr.df <- yr.df[yr.df$data.edate == max(yr.df$data.edate), ]
+  yearly.edate <- max(yr.df$data.edate)
 
-  max.qyr <-  max(keep.version.df$yr[keep.version.df$update == "quarterly"])
-  keep.q.df <- keep.version.df[keep.version.df$update == "quarterly" &
-                                 keep.version.df$yr == max.qyr, ]
-  if (nrow(keep.q.df) > 0) {
-    keep.q.df <- keep.q.df[keep.q.df$mon == max(keep.q.df$mon), ]
+  ## Quarterly: keep only quarterlies whose coverage extends past the yearly.
+  ## Among those, keep only the latest quarterly per calendar year (largest
+  ## data.edate). This ensures e.g. 25.01.25.12 is retained even when
+  ## 26.01.26.03 also exists.
+  q.df <- keep.version.df[keep.version.df$update == "quarterly" &
+                            keep.version.df$data.edate > yearly.edate, ]
+  if (nrow(q.df) > 0) {
+    q.df$cov.yr <- as.numeric(format(q.df$data.edate, "%Y"))
+    keep.q.df <- do.call(rbind, lapply(split(q.df, q.df$cov.yr),
+                                       function(d) d[which.max(d$data.edate), , drop = FALSE]))
+    keep.q.df$cov.yr <- NULL
+  } else {
+    keep.q.df <- q.df
   }
 
+  ## Monthly: keep only monthlies whose coverage extends past the latest kept
+  ## quarterly (or past the yearly if no quarterlies kept).
+  cutoff.edate <- if (nrow(keep.q.df) > 0) max(keep.q.df$data.edate) else yearly.edate
   keep.m.df <- keep.version.df[keep.version.df$update == "monthly" &
-                                 keep.version.df$yr >= max(keep.version.df$yr), ]
-  if (nrow(keep.q.df) > 0) {
-    keep.m.df <- keep.m.df[keep.m.df$ref_date > max(keep.q.df$ref_date), ]
-  }
+                                 keep.version.df$data.edate > cutoff.edate, ]
 
   ## Return final result
   version.out.df <- unique(rbind(keep.yr.df, keep.q.df, keep.m.df))
   return(version.out.df)
 }
+
